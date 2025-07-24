@@ -31,15 +31,11 @@
             <div id="tab-0" class="tab-content h-full flex flex-col">
                 <h2 class="text-white text-2xl font-bold mb-4">Voter Dashboard</h2>
 
-                <!-- Row Layout -->
-                <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex grow items-start">
+                <!-- Responsive Grid Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
 
-
-
-
-                    <!-- Clock + Nomination Status in one column -->
+                    <!-- Left Column: Profile, Clock, Voting Status -->
                     <div class="flex flex-col gap-4">
-
                         <!-- Profile Overview Section -->
                         <div id="profileCard"
                             class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
@@ -52,6 +48,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- Clock -->
                         <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
                             <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
@@ -68,64 +65,77 @@
                         </div>
                     </div>
 
-                    <!-- Announcements -->
-                    <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-80 overflow-hidden">
-                        <div class="flex items-center justify-between mb-2">
-                            <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements</h2>
-                            <span class="text-xs text-gray-500">Latest Updates</span>
-                        </div>
-                        <div id="announcementList" class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow">
-                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to iElect
-                                Platform!</div>
-                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day is
-                                approaching.</div>
-                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination deadline:
-                                July 25th</div>
+                    <!-- Middle Column: Announcements -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-full overflow-hidden">
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements
+                                </h2>
+                                <span class="text-xs text-gray-500">Latest Updates</span>
+                            </div>
+                            <div id="announcementList"
+                                class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to
+                                    iElect Platform!
+                                </div>
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day is
+                                    approaching.
+                                </div>
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination
+                                    deadline: July
+                                    25th</div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Calendar -->
-                    <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-auto relative">
-                        <div id="calendarContainer" class="text-black-800 w-full relative h-auto">
-                            <div id="calendarView" class="flex flex-col">
-                                <!-- Header -->
-                                <div class="flex justify-between items-center mb-3">
-                                    <button onclick="changeMonth(-1)"
-                                        class="text-white bg-pink-500 hover:bg-pink-600 px-2 py-1 rounded-full text-sm">‹</button>
-                                    <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
-                                    <button onclick="changeMonth(1)"
-                                        class="text-white bg-pink-500 hover:bg-pink-600 px-2 py-1 rounded-full text-sm">›</button>
+                    <!-- Right Column: Calendar -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white/70 rounded-2xl p-4 shadow-md relative h-full">
+                            <div id="calendarContainer" class="text-black-800 w-full h-auto">
+                                <div id="calendarView" class="flex flex-col">
+                                    <!-- Header -->
+                                    <div class="flex justify-between items-center mb-3">
+                                        <button onclick="changeMonth(-1)"
+                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
+                                        <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
+                                        <button onclick="changeMonth(1)"
+                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
+                                    </div>
+
+                                    <!-- Week Days -->
+                                    <div
+                                        class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
+                                        <div>Sun</div>
+                                        <div>Mon</div>
+                                        <div>Tue</div>
+                                        <div>Wed</div>
+                                        <div>Thu</div>
+                                        <div>Fri</div>
+                                        <div>Sat</div>
+                                    </div>
+
+                                    <!-- Days -->
+                                    <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
+                                    </div>
                                 </div>
 
-                                <!-- Week Days -->
-                                <div class="grid grid-cols-7 gap-1 text-center font-medium text-gray-600 text-xs mb-1">
-                                    <div>Sun</div>
-                                    <div>Mon</div>
-                                    <div>Tue</div>
-                                    <div>Wed</div>
-                                    <div>Thu</div>
-                                    <div>Fri</div>
-                                    <div>Sat</div>
+                                <!-- Event Detail -->
+                                <div id="eventView"
+                                    class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
+                                    <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
+                                            id="selectedDate"></span>
+                                    </h3>
+                                    <p id="eventText" class="text-gray-700 text-center mb-4"></p>
+                                    <button onclick="closeEvent()"
+                                        class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
+                                        Back to Calendar</button>
                                 </div>
-
-                                <!-- Days -->
-                                <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2"></div>
-                            </div>
-
-                            <!-- Event Detail -->
-                            <div id="eventView"
-                                class="absolute inset-0 bg-white/90 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
-                                <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
-                                        id="selectedDate"></span></h3>
-                                <p id="eventText" class="text-gray-700 text-center mb-4"></p>
-                                <button onclick="closeEvent()"
-                                    class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
-                                    Back to Calendar</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <!-- Tab 1 -->
             <div id="tab-1" class="tab-content hidden text-white">
@@ -249,13 +259,13 @@
                 const isEvent = events.hasOwnProperty(dateKey);
                 const isToday = dateKey === todayKey;
 
-                let btnClass = "bg-white text-gray-800 hover:bg-gray-100";
+                let btnClass = "bg-white/80 text-black hover:bg-blue-200";
                 if (isToday && isEvent) {
                     btnClass = "bg-yellow-600 text-white font-bold border border-yellow-800 shadow-md hover:bg-yellow-700";
                 } else if (isToday) {
-                    btnClass = "bg-blue-300 text-black font-bold border border-purple-500 shadow-md hover:bg-purple-400";
+                    btnClass = "bg-pink-600 text-white font-bold border border-black shadow-md hover:bg-purple-400";
                 } else if (isEvent) {
-                    btnClass = "bg-pink-600 text-white font-bold border border-pink-800 shadow-md hover:bg-pink-700";
+                    btnClass = "bg-purple-300 text-black font-bold border border-black/50 shadow-md hover:bg-pink-700";
                 }
 
                 calendarDays.innerHTML += `<button onclick="showEvent('${dateKey}')" class="${btnClass} py-1 rounded-md shadow-sm">${day}</button>`;
