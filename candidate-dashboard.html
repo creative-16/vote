@@ -28,30 +28,28 @@
             class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
 
             <!-- Tab 0 -->
+            <!-- Tab 0 -->
             <div id="tab-0" class="tab-content h-full flex flex-col">
                 <h2 class="text-white text-2xl font-bold mb-4">Candidate Dashboard</h2>
 
-                <!-- Row Layout -->
-                <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex grow items-start">
+                <!-- Responsive Grid Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
 
-
-
-
-                    <!-- Clock + Nomination Status in one column -->
+                    <!-- Left Column: Profile, Clock, Voting Status -->
                     <div class="flex flex-col gap-4">
-
                         <!-- Profile Overview Section -->
                         <div id="profileCard"
                             class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
                             onclick="openTab(2)">
                             <div class="flex items-center gap-3">
-                                <img src="./pic/2.png" alt="C" class="w-12 h-12 rounded-full object-cover">
+                                <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
                                 <div>
                                     <h3 class="text-lg font-semibold text-gray-800" id="profileName">Candidate Name</h3>
                                     <p class="text-sm text-gray-500" id="profileDept">Department</p>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Clock -->
                         <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
                             <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
@@ -59,75 +57,86 @@
                             <div class="text-lg mt-1 text-gray-600" id="day"></div>
                         </div>
 
-                        <!-- Nomination Status Section -->
+                        <!-- Voting Status Section -->
                         <div class="bg-white shadow-lg rounded-xl p-4">
                             <h2 class="text-lg font-semibold text-gray-800 mb-2">Nomination Status</h2>
-                            <div id="nominationStatus" class="text-blue-600 font-medium text-md">
+                            <div id="votingStatus" class="text-blue-600 font-medium text-md">
                                 Loading status...
                             </div>
                         </div>
                     </div>
 
-
-                    <!-- Announcements -->
-                    <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-80 overflow-hidden">
-                        <div class="flex items-center justify-between mb-2">
-                            <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements</h2>
-                            <span class="text-xs text-gray-500">Latest Updates</span>
-                        </div>
-                        <div id="announcementList" class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow">
-                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to iElect
-                                Platform!</div>
-                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day is
-                                approaching.</div>
-                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination deadline:
-                                July 25th</div>
-                        </div>
-                    </div>
-
-                    <!-- Calendar -->
-                    <div class="bg-white/70 rounded-2xl p-4 shadow-md flex flex-col h-auto relative">
-                        <div id="calendarContainer" class="text-black-800 w-full relative h-auto">
-                            <div id="calendarView" class="flex flex-col">
-                                <!-- Header -->
-                                <div class="flex justify-between items-center mb-3">
-                                    <button onclick="changeMonth(-1)"
-                                        class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
-                                    <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
-                                    <button onclick="changeMonth(1)"
-                                        class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
-                                </div>
-
-                                <!-- Week Days -->
-                                <div class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
-                                    <div>Sun</div>
-                                    <div>Mon</div>
-                                    <div>Tue</div>
-                                    <div>Wed</div>
-                                    <div>Thu</div>
-                                    <div>Fri</div>
-                                    <div>Sat</div>
-                                </div>
-
-                                <!-- Days -->
-                                <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2"></div>
+                    <!-- Middle Column: Announcements -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-full overflow-hidden">
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements
+                                </h2>
+                                <span class="text-xs text-gray-500">Latest Updates</span>
                             </div>
-
-                            <!-- Event Detail -->
-                            <div id="eventView"
-                                class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
-                                <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
-                                        id="selectedDate"></span></h3>
-                                <p id="eventText" class="text-gray-700 text-center mb-4"></p>
-                                <button onclick="closeEvent()"
-                                    class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
-                                    Back to Calendar</button>
+                            <div id="announcementList"
+                                class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to
+                                    iElect Platform!
+                                </div>
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day is
+                                    approaching.
+                                </div>
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination
+                                    deadline: July
+                                    25th</div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Right Column: Calendar -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white/70 rounded-2xl p-4 shadow-md relative h-full">
+                            <div id="calendarContainer" class="text-black-800 w-full h-auto">
+                                <div id="calendarView" class="flex flex-col">
+                                    <!-- Header -->
+                                    <div class="flex justify-between items-center mb-3">
+                                        <button onclick="changeMonth(-1)"
+                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
+                                        <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
+                                        <button onclick="changeMonth(1)"
+                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
+                                    </div>
+
+                                    <!-- Week Days -->
+                                    <div
+                                        class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
+                                        <div>Sun</div>
+                                        <div>Mon</div>
+                                        <div>Tue</div>
+                                        <div>Wed</div>
+                                        <div>Thu</div>
+                                        <div>Fri</div>
+                                        <div>Sat</div>
+                                    </div>
+
+                                    <!-- Days -->
+                                    <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
+                                    </div>
+                                </div>
+
+                                <!-- Event Detail -->
+                                <div id="eventView"
+                                    class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
+                                    <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
+                                            id="selectedDate"></span>
+                                    </h3>
+                                    <p id="eventText" class="text-gray-700 text-center mb-4"></p>
+                                    <button onclick="closeEvent()"
+                                        class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
+                                        Back to Calendar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
 
             <!-- Tab 1 -->
             <div id="tab-1" class="tab-content hidden text-white">
