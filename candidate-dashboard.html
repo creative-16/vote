@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Candidate Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body
+    class="bg-gradient-to-br from-pink-100 via-pink-200 to-pink-300 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div
+        class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
+
+        <!-- Sidebar -->
+        <div
+            class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
+            <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
+            <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
+            <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
+        </div>
+
+        <!-- Content -->
+        <div
+            class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
+
+            <!-- Tab 0 -->
+            <div id="tab-0" class="tab-content h-full flex flex-col">
+                <h2 class="text-white text-2xl font-bold mb-4">Candidate Dashboard</h2>
+
+                <!-- Row Layout -->
+                <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex grow items-start">
+
+
+
+
+                    <!-- Clock + Nomination Status in one column -->
+                    <div class="flex flex-col gap-4">
+
+                        <!-- Profile Overview Section -->
+                        <div id="profileCard"
+                            class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
+                            onclick="openTab(2)">
+                            <div class="flex items-center gap-3">
+                                <img src="./pic/2.png" alt="C" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800" id="profileName">Candidate Name</h3>
+                                    <p class="text-sm text-gray-500" id="profileDept">Department</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Clock -->
+                        <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
+                            <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
+                            <div class="text-3xl font-semibold" id="time"></div>
+                            <div class="text-lg mt-1 text-gray-600" id="day"></div>
+                        </div>
+
+                        <!-- Nomination Status Section -->
+                        <div class="bg-white shadow-lg rounded-xl p-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-2">Nomination Status</h2>
+                            <div id="nominationStatus" class="text-blue-600 font-medium text-md">
+                                Loading status...
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Announcements -->
+                    <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-80 overflow-hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements</h2>
+                            <span class="text-xs text-gray-500">Latest Updates</span>
+                        </div>
+                        <div id="announcementList" class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow">
+                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to iElect
+                                Platform!</div>
+                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day is
+                                approaching.</div>
+                            <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination deadline:
+                                July 25th</div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar -->
+                    <div class="bg-white/70 rounded-2xl p-4 shadow-md flex flex-col h-auto relative">
+                        <div id="calendarContainer" class="text-black-800 w-full relative h-auto">
+                            <div id="calendarView" class="flex flex-col">
+                                <!-- Header -->
+                                <div class="flex justify-between items-center mb-3">
+                                    <button onclick="changeMonth(-1)"
+                                        class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
+                                    <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
+                                    <button onclick="changeMonth(1)"
+                                        class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
+                                </div>
+
+                                <!-- Week Days -->
+                                <div class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
+                                    <div>Sun</div>
+                                    <div>Mon</div>
+                                    <div>Tue</div>
+                                    <div>Wed</div>
+                                    <div>Thu</div>
+                                    <div>Fri</div>
+                                    <div>Sat</div>
+                                </div>
+
+                                <!-- Days -->
+                                <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2"></div>
+                            </div>
+
+                            <!-- Event Detail -->
+                            <div id="eventView"
+                                class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
+                                <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
+                                        id="selectedDate"></span></h3>
+                                <p id="eventText" class="text-gray-700 text-center mb-4"></p>
+                                <button onclick="closeEvent()"
+                                    class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
+                                    Back to Calendar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Tab 1 -->
+            <div id="tab-1" class="tab-content hidden text-white">
+                <h2 class="text-2xl font-bold mb-2">📝 Nomination Section</h2>
+                <!-- Nomination Submission Section -->
+                <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-8">
+                    <div class="flex justify-center"><button id="toggleNomination"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            Nomination
+                        </button></div>
+
+                    <div id="nominationForm" class="mt-6 hidden transition-all duration-300">
+                        <form id="candidateNominationForm" class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Full Name</label>
+                                <input type="text"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    required>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Department / Class</label>
+                                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Post Applying For</label>
+                                <select
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                    required>
+
+                                    <option value="">-- Select Post --</option>
+                                    <option value="President">President</option>
+                                    <option value="Vice President">Vice President</option>
+                                    <option value="Secretary">Secretary</option>
+                                    <option value="Treasurer">Treasurer</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Nomination Statement</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2" rows="4" required
+                                    placeholder="Why should you be elected?"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Upload Photo (Optional)</label>
+                                <input type="file" class="w-full">
+                            </div>
+                            <div class="flex justify-end gap-3 mt-4">
+                                <button type="submit"
+                                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                                    Submit Nomination
+                                </button>
+                                <button type="button" id="cancelNomination"
+                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+                <!-- View Nomination Section -->
+                <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-6">
+                    <div class="flex justify-center"><button id="toggleViewNomination"
+                            class="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600">
+                            View Submitted Nomination
+                        </button>
+                    </div>
+
+                    <div id="viewNomination" class="mt-6 hidden space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="font-medium text-gray-600">Full Name</label>
+                                <p id="viewFullName" class="text-gray-800">--</p>
+                            </div>
+                            <div>
+                                <label class="font-medium text-gray-600">Department / Class</label>
+                                <p id="viewDepartment" class="text-gray-800">--</p>
+                            </div>
+                            <div>
+                                <label class="font-medium text-gray-600">Post Applying For</label>
+                                <p id="viewPost" class="text-gray-800">--</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="font-medium text-gray-600">Nomination Statement</label>
+                                <p id="viewStatement" class="text-gray-800">--</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-4 pt-4">
+                            <button id="editNomination"
+                                class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                                Edit
+                            </button>
+                            <button id="cancelNomination"
+                                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                Cancel Nomination
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Tab 2 -->
+            <div id="tab-2" class="tab-content hidden text-white">
+                <h2 class="text-2xl font-bold mb-2">👤 Profile</h2>
+                <!-- PROFILE TAB CONTENT -->
+
+
+                <!-- Section: Create Voter Profile -->
+                <!-- View Profile Section -->
+                <div class="bg-gray-100 p-6 rounded-lg shadow space-y-4 text-gray-700">
+                    <div class="bg-white shadow-lg rounded-xl p-6">
+
+                        <p class="text-green-700 font-semibold">✅ Your profile has been successfully created!</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><strong>Full Name:</strong> Abhishek Sharma</div>
+                            <div><strong>Email:</strong> abhi@example.com</div>
+                            <div><strong>Student ID:</strong> 123456</div>
+                            <div><strong>Department:</strong> Computer Science</div>
+                            <div><strong>Class:</strong> CS-B</div>
+                            <div><strong>Booth No.:</strong> 2A</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Optional Button to Go to Dashboard -->
+                    <div class="flex justify-center mt-6">
+                        <a href="candidate-dashboard.html">
+                            <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                                Go to Dashboard
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Section: Generate QR / Code (Coming Soon) -->
+                <div class="bg-gray-100 shadow-inner rounded-xl p-6">
+                    <h2 class="text-xl font-bold text-gray-500 mb-2">🔒 Generate Voter Code / QR</h2>
+                    <p class="text-sm text-gray-400 italic">This feature will be available after profile creation is
+                        complete.</p>
+                </div>
+
+                <!-- Section: Future Additions -->
+                <div class="bg-gray-100 shadow-inner rounded-xl p-6">
+                    <h2 class="text-xl font-bold text-gray-500 mb-2">📌 Additional Options (Coming Soon)</h2>
+                    <p class="text-sm text-gray-400 italic">More voter profile tools will be added here soon.</p>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- Tab JS -->
+    <script>
+        function openTab(index) {
+            document.querySelectorAll(".tab-content").forEach((tab, i) => {
+                tab.classList.toggle("hidden", i !== index);
+            });
+        }
+
+        // Clock and Date
+        function updateTimeOnly() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            document.getElementById('time').textContent = time;
+        }
+
+        function updateDateAndDay() {
+            const now = new Date();
+            document.getElementById('date').textContent = now.toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+            document.getElementById('day').textContent = now.toLocaleDateString('en-IN', { weekday: 'long' });
+        }
+
+        updateDateAndDay();
+        updateTimeOnly();
+        setInterval(updateTimeOnly, 1000);
+        setInterval(updateDateAndDay, 60000);
+
+        // Calendar Logic
+        const events = {
+            "2025-07-25": "🗳️ Nomination Submission Deadline",
+            "2025-08-01": "📣 Campaign Starts",
+            "2025-08-10": "🗓️ Final Election Day",
+            "2025-07-30": "🗓️ Registration Closing Date"
+        };
+
+        let currentDate = new Date();
+
+        function renderCalendar() {
+            const calendarDays = document.getElementById('calendarDays');
+            const monthYear = document.getElementById('monthYear');
+            calendarDays.innerHTML = "";
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const todayKey = new Date().toISOString().slice(0, 10);
+
+            monthYear.textContent = currentDate.toLocaleString('default', { month: 'long' }) + ` ${year}`;
+
+            for (let i = 0; i < firstDay; i++) {
+                calendarDays.innerHTML += `<div></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isEvent = events.hasOwnProperty(dateKey);
+                const isToday = dateKey === todayKey;
+
+                let btnClass = "bg-white/80 text-black hover:bg-blue-200";
+                if (isToday && isEvent) {
+                    btnClass = "bg-yellow-600 text-white font-bold border border-yellow-800 shadow-md hover:bg-yellow-700";
+                } else if (isToday) {
+                    btnClass = "bg-pink-600 text-white font-bold border border-black shadow-md hover:bg-purple-400";
+                } else if (isEvent) {
+                    btnClass = "bg-purple-300 text-black font-bold border border-black/50 shadow-md hover:bg-pink-700";
+                }
+
+                calendarDays.innerHTML += `<button onclick="showEvent('${dateKey}')" class="${btnClass} py-1 rounded-md shadow-sm">${day}</button>`;
+            }
+        }
+
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            renderCalendar();
+        }
+
+        function showEvent(dateKey) {
+            document.getElementById('selectedDate').textContent = new Date(dateKey).toDateString();
+            document.getElementById('eventText').textContent = events[dateKey] || "No events on this day.";
+            document.getElementById('eventView').classList.remove('hidden');
+        }
+
+        function closeEvent() {
+            document.getElementById('eventView').classList.add('hidden');
+        }
+
+        renderCalendar();
+
+
+        document.getElementById("toggleNomination").addEventListener("click", () => {
+            const form = document.getElementById("nominationForm");
+            form.classList.toggle("hidden");
+        });
+
+        document.getElementById("candidateNominationForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            // TODO: Add your Firebase / Backend handling code here
+            alert("Nomination submitted successfully!");
+            this.reset();
+        });
+
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.getElementById("toggleNomination");
+            const nominationForm = document.getElementById("nominationForm");
+            const cancelButton = document.getElementById("cancelNomination");
+            const form = document.getElementById("candidateNominationForm");
+
+            // Expand/collapse form when main button is clicked
+            if (toggleButton && nominationForm) {
+                toggleButton.addEventListener("click", () => {
+                    nominationForm.classList.toggle("hidden");
+                });
+            }
+
+            // Hide form when cancel button is clicked
+            if (cancelButton && nominationForm) {
+                cancelButton.addEventListener("click", () => {
+                    nominationForm.classList.add("hidden");
+                });
+            }
+
+            // Form submission
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    alert("Nomination submitted successfully!");
+                    form.reset();
+                    nominationForm.classList.add("hidden");
+                });
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.getElementById("toggleNomination");
+            const nominationForm = document.getElementById("nominationForm");
+            const cancelButton = document.getElementById("cancelNomination");
+            const form = document.getElementById("candidateNominationForm");
+
+            // Expand/collapse form when main button is clicked
+            if (toggleButton && nominationForm) {
+                toggleButton.addEventListener("click", () => {
+                    nominationForm.classList.toggle("hidden");
+                });
+            }
+
+            // Hide form when cancel button is clicked
+            if (cancelButton && nominationForm) {
+                cancelButton.addEventListener("click", () => {
+                    nominationForm.classList.add("hidden");
+                });
+            }
+
+            // Form submission
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    alert("Nomination submitted successfully!");
+                    form.reset();
+                    nominationForm.classList.add("hidden");
+                });
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const viewBtn = document.getElementById("toggleViewNomination");
+            const viewSection = document.getElementById("viewNomination");
+            const formSection = document.getElementById("nominationForm");
+
+            // Toggle visibility
+            viewBtn.addEventListener("click", () => {
+                viewSection.classList.toggle("hidden");
+            });
+
+            // Edit nomination
+            document.getElementById("editNomination").addEventListener("click", () => {
+                // Hide view section, show form
+                viewSection.classList.add("hidden");
+                formSection.classList.remove("hidden");
+                window.scrollTo({ top: formSection.offsetTop - 80, behavior: "smooth" });
+            });
+
+            // Cancel nomination
+            document.getElementById("cancelNomination").addEventListener("click", async () => {
+                if (confirm("Are you sure you want to cancel your nomination?")) {
+                    const user = auth.currentUser;
+                    if (user) {
+                        try {
+                            await db.collection("nominations").doc(user.uid).delete();
+                            alert("Nomination canceled.");
+                            location.reload(); // or manually update UI
+                        } catch (error) {
+                            console.error("Error cancelling nomination:", error);
+                            alert("Error cancelling nomination.");
+                        }
+                    }
+                }
+            });
+
+            // Load nomination details
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const docRef = db.collection("nominations").doc(user.uid);
+                    const docSnap = await docRef.get();
+
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        document.getElementById("viewFullName").textContent = data.fullName || "--";
+                        document.getElementById("viewDepartment").textContent = data.department || "--";
+                        document.getElementById("viewPost").textContent = data.post || "--";
+                        document.getElementById("viewStatement").textContent = data.statement || "--";
+                    } else {
+                        viewSection.innerHTML = `<p class="text-gray-500">No nomination submitted.</p>`;
+                    }
+                }
+            });
+        });
+
+
+    </script>
+
+
+    <!-- Scrollbar -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #ec4899;
+            border-radius: 3px;
+        }
+    </style>
+</body>
+
+</html>
