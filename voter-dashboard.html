@@ -32,14 +32,39 @@
                 <h2 class="text-white text-2xl font-bold mb-4">Voter Dashboard</h2>
 
                 <!-- Row Layout -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow items-start">
+                <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex grow items-start">
 
-                    <!-- Clock -->
-                    <div class="bg-white/90 rounded-2xl p-6 shadow-md hover:shadow-xl transition">
-                        <div id="clock" class="text-center text-gray-800">
-                            <div class="text-xl font-semibold">📅 <span id="date"></span></div>
-                            <div class="text-3xl font-bold mt-1 tracking-wide" id="time"></div>
+
+
+
+                    <!-- Clock + Nomination Status in one column -->
+                    <div class="flex flex-col gap-4">
+
+                        <!-- Profile Overview Section -->
+                        <div id="profileCard"
+                            class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
+                            onclick="openTab(2)">
+                            <div class="flex items-center gap-3">
+                                <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800" id="profileName">Voter Name</h3>
+                                    <p class="text-sm text-gray-500" id="profileDept">Department</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Clock -->
+                        <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
+                            <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
+                            <div class="text-3xl font-semibold" id="time"></div>
                             <div class="text-lg mt-1 text-gray-600" id="day"></div>
+                        </div>
+
+                        <!-- Voting Status Section -->
+                        <div class="bg-white shadow-lg rounded-xl p-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-2">Voting Status</h2>
+                            <div id="votingStatus" class="text-blue-600 font-medium text-md">
+                                Loading status...
+                            </div>
                         </div>
                     </div>
 
