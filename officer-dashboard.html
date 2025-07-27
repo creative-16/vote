@@ -155,9 +155,9 @@
                 <div class="flex gap-2 mt-3">
                     <button onclick="markReview('${docSnap.id}')"
                         class="bg-white text-yellow-700 px-4 py-1 rounded border border-yellow-500 hover:bg-yellow-50">Review</button>
-                    <button onclick="updateStatus('${docSnap.id}', 'Approved')"
+                    <button onclick="updateStatus('${docSnap.id}', 'approved')"
                         class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">Approve</button>
-                    <button onclick="updateStatus('${docSnap.id}', 'Rejected')"
+                    <button onclick="updateStatus('${docSnap.id}', 'rejected')"
                         class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700">Reject</button>
                 </div>
                 `;
@@ -167,7 +167,7 @@
 
                     window.markReview = async function (id) {
                         const nominationRef = doc(db, "nominations", id);
-                        await updateDoc(nominationRef, { status: "Pending" });
+                        await updateDoc(nominationRef, { status: "pending" });
                         loadNominations();
                     };
 
