@@ -89,18 +89,19 @@
 
             <!-- Candidate Login Tab -->
             <!-- Candidate Login Tab -->
-<div id="candidate-login-tab" class="hidden p-6">
-    <h2 class="text-2xl font-bold text-center mb-6 text-white">Candidate Login</h2>
-    <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl space-y-2">
-        <input id="candidate-id" type="text" placeholder="Candidate ID" class="w-full px-4 py-3 border rounded-xl" />
-        <input id="candidate-passcode" type="text" placeholder="Passcode" class="w-full px-4 py-3 border rounded-xl" />
-        
-        <!-- ✅ This is the missing onclick that triggers the login -->
-        <button onclick="handleLogin('candidate')" class="w-full bg-blue-500 text-white py-3 rounded-xl">Login</button>
-        
-        <button onclick="showTab('role-select-tab')" class="w-full text-sm text-gray-500 mt-2">← Back</button>
-    </div>
-</div>
+            <div id="candidate-login-tab" class="hidden p-6">
+                <h2 class="text-2xl font-bold text-center mb-6 text-white">Candidate Login</h2>
+                <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl space-y-2">
+                    <input id="candidate-id" type="text" placeholder="Candidate ID"
+                        class="w-full px-4 py-3 border rounded-xl" />
+                    <input id="candidate-passcode" type="text" placeholder="Passcode"
+                        class="w-full px-4 py-3 border rounded-xl" />
+                    <button onclick="handleLogin('candidate')"
+                        class="w-full bg-blue-500 text-white py-3 rounded-xl">Login</button>
+                    <button onclick="showTab('role-select-tab')" class="w-full text-sm text-gray-500 mt-2">←
+                        Back</button>
+                </div>
+            </div>
 
 
             <!-- Officer Login Tab -->
@@ -167,11 +168,13 @@
             const snapshot = await getDocs(q);
 
             if (!snapshot.empty) {
+                localStorage.setItem("userId", id);        // Save candidate ID
+                localStorage.setItem("userRole", role);    // Optional: save role
                 window.location.href = `${role}-dashboard.html`;
-            }
-            else {
+            } else {
                 alert("Invalid ID or Passcode");
             }
+
         };
     </script>
 
