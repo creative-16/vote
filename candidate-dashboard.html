@@ -57,7 +57,7 @@
                             <div class="text-lg mt-1 text-gray-600" id="day"></div>
                         </div>
 
-                        <!-- Voting Status Section -->
+                        <!-- Nimination Status Section -->
                         <div class="bg-white shadow-lg rounded-xl p-4">
                             <h2 class="text-lg font-semibold text-gray-800 mb-2">Nomination Status</h2>
                             <div id="votingStatus" class="text-blue-600 font-medium text-md">
@@ -143,31 +143,57 @@
                 <h2 class="text-2xl font-bold mb-2">📝 Nomination Section</h2>
                 <!-- Nomination Submission Section -->
                 <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-8">
+                    <div id="successMessage"
+                        class="hidden mt-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg shadow-md text-center transition-all duration-300">
+                        🎉 Nomination submitted successfully!
+                    </div>
+
+                    <div id="nominationLimitMessage" class="hidden text-red-600 font-semibold mb-4"></div>
+
+
                     <div class="flex justify-center"><button id="toggleNomination"
                             class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                             Nomination
                         </button></div>
 
-                    <div id="nominationForm" class="mt-6 hidden transition-all duration-300">
+                    <div id="nominationForm" class="mt-6 hidden transition-all duration-300 text-black">
                         <form id="candidateNominationForm" class="space-y-4">
+                            <!-- Full Name -->
                             <div>
                                 <label class="block text-gray-700 font-medium mb-1">Full Name</label>
-                                <input type="text"
+                                <input type="text" name="fullName"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     required>
                             </div>
 
+                            <!-- Date of Birth -->
                             <div>
-                                <label class="block text-gray-700 font-medium mb-1">Department / Class</label>
-                                <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                                <label class="block text-gray-700 font-medium mb-1">Date of Birth</label>
+                                <input type="date" name="dob"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    required>
                             </div>
 
+                            <!-- Qualification -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Qualification</label>
+                                <input type="text" name="qualification"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            </div>
+
+                            <!-- Department / Class -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Department / Class</label>
+                                <input type="text" name="department"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            </div>
+
+                            <!-- Post Applying For -->
                             <div>
                                 <label class="block text-gray-700 font-medium mb-1">Post Applying For</label>
-                                <select
+                                <select name="post"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
                                     required>
-
                                     <option value="">-- Select Post --</option>
                                     <option value="President">President</option>
                                     <option value="Vice President">Vice President</option>
@@ -176,366 +202,553 @@
                                 </select>
                             </div>
 
+                            <!-- Nomination Statement -->
                             <div>
                                 <label class="block text-gray-700 font-medium mb-1">Nomination Statement</label>
-                                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2" rows="4" required
-                                    placeholder="Why should you be elected?"></textarea>
+                                <textarea name="statement" class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                    rows="4" required placeholder="Why should you be elected?"></textarea>
                             </div>
 
+                            <!-- Party Name -->
                             <div>
-                                <label class="block text-gray-700 font-medium mb-1">Upload Photo (Optional)</label>
-                                <input type="file" class="w-full">
+                                <label class="block text-gray-700 font-medium mb-1">Party Name</label>
+                                <input type="text" name="partyName"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
                             </div>
+
+                            <!-- Party Symbol Name -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Party Symbol Name</label>
+                                <input type="text" name="symbolName"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            </div>
+
+                            <!-- Upload Candidate Photo -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Upload Profile Photo<span
+                                        class="text-xs text-gray-500">(Recommended: square, 400x400px)</span></label>
+                                <label
+                                    class="w-full flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-100 transition">
+                                    <input type="file" name="photo" accept="image/*" class="hidden">
+                                    <span class="text-gray-600">Choose a file</span>
+                                </label>
+                            </div>
+
+                            <!-- Upload Symbol Image -->
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Upload Party Symbol Image <span
+                                        class="text-xs text-gray-500">(Recommended: square, 200x200px)</span></label>
+                                <label
+                                    class="w-full flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-100 transition">
+                                    <input type="file" name="symbolImage" accept="image/*" class="hidden">
+                                    <span class="text-gray-600">Choose a symbol image</span>
+                                </label>
+                            </div>
+
+                            <!-- Buttons -->
                             <div class="flex justify-end gap-3 mt-4">
                                 <button type="submit"
-                                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
                                     Submit Nomination
                                 </button>
-                                <button type="button" id="cancelNomination"
-                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                                <button type="button" id="closeNomination"
+                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
                                     Cancel
                                 </button>
                             </div>
                         </form>
                     </div>
 
+
                 </div>
                 <!-- View Nomination Section -->
                 <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-6">
-                    <div class="flex justify-center"><button id="toggleViewNomination"
-                            class="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600">
+                    <!-- Toggle Button -->
+                    <div class="flex justify-center">
+                        <button id="toggleViewNomination"
+                            class="bg-purple-700 text-white px-5 py-2 rounded-xl hover:bg-purple-600 transition duration-200 shadow-md">
                             View Submitted Nomination
                         </button>
                     </div>
 
-                    <div id="viewNomination" class="mt-6 hidden space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Nomination Details -->
+                    <div id="viewNomination" class="mt-6 hidden space-y-6 border-t pt-6 border-gray-300">
+
+                        <!-- Basic Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="font-medium text-gray-600">Full Name</label>
-                                <p id="viewFullName" class="text-gray-800">--</p>
+                                <label class="font-semibold text-gray-500">Full Name</label>
+                                <p id="viewFullName" class="text-gray-800 text-lg font-medium">--</p>
                             </div>
                             <div>
-                                <label class="font-medium text-gray-600">Department / Class</label>
-                                <p id="viewDepartment" class="text-gray-800">--</p>
+                                <label class="font-semibold text-gray-500">Department / Class</label>
+                                <p id="viewDepartment" class="text-gray-800 text-lg font-medium">--</p>
                             </div>
                             <div>
-                                <label class="font-medium text-gray-600">Post Applying For</label>
-                                <p id="viewPost" class="text-gray-800">--</p>
+                                <label class="font-semibold text-gray-500">Post Applying For</label>
+                                <p id="viewPost" class="text-gray-800 text-lg font-medium">--</p>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="font-medium text-gray-600">Nomination Statement</label>
-                                <p id="viewStatement" class="text-gray-800">--</p>
+                                <label class="font-semibold text-gray-500">Nomination Statement</label>
+                                <p id="viewStatement"
+                                    class="text-gray-800 text-base leading-relaxed bg-gray-50 p-3 rounded-xl shadow-inner">
+                                    --</p>
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-4 pt-4">
-                            <button id="editNomination"
-                                class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
-                                Edit
-                            </button>
-                            <button id="cancelNomination"
-                                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-                                Cancel Nomination
+                        <!-- Additional Details -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="font-semibold text-gray-500">Qualification</label>
+                                <p id="viewQualification" class="text-gray-800 text-base">--</p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-500">Party Name</label>
+                                <p id="viewPartyName" class="text-gray-800 text-base">--</p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-500">Symbol Name</label>
+                                <p id="viewSymbolName" class="text-gray-800 text-base">--</p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-500">Date of Birth</label>
+                                <p id="viewDOB" class="text-gray-800 text-base">--</p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-500">Status</label>
+                                <p id="viewStatus" class="text-gray-800 font-semibold">--</p>
+                            </div>
+                        </div>
+
+                        <!-- Close Button (separate from toggle) -->
+                        <div class="flex justify-end">
+                            <button id="closeViewNomination"
+                                class="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition duration-200 shadow">
+                                Close
                             </button>
                         </div>
+
                     </div>
                 </div>
 
             </div>
-
             <!-- Tab 2 -->
             <div id="tab-2" class="tab-content hidden text-white">
-                <h2 class="text-2xl font-bold mb-2">👤 Profile</h2>
-                <!-- PROFILE TAB CONTENT -->
+                <h2 class="text-2xl font-bold mb-4">👤 Profile</h2>
 
-
-                <!-- Section: Create Voter Profile -->
                 <!-- View Profile Section -->
-                <div class="bg-gray-100 p-6 rounded-lg shadow space-y-4 text-gray-700">
-                    <div class="bg-white shadow-lg rounded-xl p-6">
-
-                        <p class="text-green-700 font-semibold">✅ Your profile has been successfully created!</p>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><strong>Full Name:</strong> Abhishek Sharma</div>
-                            <div><strong>Email:</strong> abhi@example.com</div>
-                            <div><strong>Student ID:</strong> 123456</div>
-                            <div><strong>Department:</strong> Computer Science</div>
-                            <div><strong>Class:</strong> CS-B</div>
-                            <div><strong>Booth No.:</strong> 2A</div>
+                <div class="bg-white/50 p-4 rounded-lg shadow space-y-6 text-gray-700">
+                    <div class="bg-white shadow-lg rounded-xl p-6 space-y-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Candidate Profile</h2>
+                        <div class="flex items-center space-x-6">
+                            <!-- Profile Picture Placeholder -->
+                            <div
+                                class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-sm">
+                                Profile
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                                <div><strong>Name:</strong> <span id="candidateName">--</span></div>
+                                <div><strong>Department:</strong> <span id="candidateDept">--</span></div>
+                                <div><strong>Post:</strong> <span id="candidatePost">--</span></div>
+                                <div><strong>Status:</strong> <span id="candidateStatus">--</span></div>
+                            </div>
                         </div>
-
-                    </div>
-
-                    <!-- Optional Button to Go to Dashboard -->
-                    <div class="flex justify-center mt-6">
-                        <a href="candidate-dashboard.html">
-                            <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-                                Go to Dashboard
-                            </button>
-                        </a>
                     </div>
                 </div>
 
 
-                <!-- Section: Generate QR / Code (Coming Soon) -->
-                <div class="bg-gray-100 shadow-inner rounded-xl p-6">
-                    <h2 class="text-xl font-bold text-gray-500 mb-2">🔒 Generate Voter Code / QR</h2>
-                    <p class="text-sm text-gray-400 italic">This feature will be available after profile creation is
-                        complete.</p>
+
+                <!-- Go to Dashboard Button -->
+                <div class="flex justify-center mt-4">
+                    <a href="candidate-dashboard.html">
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+                            Go to Dashboard
+                        </button>
+                    </a>
                 </div>
 
                 <!-- Section: Future Additions -->
-                <div class="bg-gray-100 shadow-inner rounded-xl p-6">
+                <div class="bg-gray-100 shadow-inner rounded-xl p-6 mt-6">
                     <h2 class="text-xl font-bold text-gray-500 mb-2">📌 Additional Options (Coming Soon)</h2>
                     <p class="text-sm text-gray-400 italic">More voter profile tools will be added here soon.</p>
                 </div>
             </div>
-
-
         </div>
 
-    </div>
 
 
-    <!-- Tab JS -->
-    <script>
-        function openTab(index) {
-            document.querySelectorAll(".tab-content").forEach((tab, i) => {
-                tab.classList.toggle("hidden", i !== index);
-            });
-        }
 
-        // Clock and Date
-        function updateTimeOnly() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-IN', {
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-            document.getElementById('time').textContent = time;
-        }
-
-        function updateDateAndDay() {
-            const now = new Date();
-            document.getElementById('date').textContent = now.toLocaleDateString('en-IN', {
-                day: 'numeric', month: 'long', year: 'numeric'
-            });
-            document.getElementById('day').textContent = now.toLocaleDateString('en-IN', { weekday: 'long' });
-        }
-
-        updateDateAndDay();
-        updateTimeOnly();
-        setInterval(updateTimeOnly, 1000);
-        setInterval(updateDateAndDay, 60000);
-
-        // Calendar Logic
-        const events = {
-            "2025-07-25": "🗳️ Nomination Submission Deadline",
-            "2025-08-01": "📣 Campaign Starts",
-            "2025-08-10": "🗓️ Final Election Day",
-            "2025-07-30": "🗓️ Registration Closing Date"
-        };
-
-        let currentDate = new Date();
-
-        function renderCalendar() {
-            const calendarDays = document.getElementById('calendarDays');
-            const monthYear = document.getElementById('monthYear');
-            calendarDays.innerHTML = "";
-
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const todayKey = new Date().toISOString().slice(0, 10);
-
-            monthYear.textContent = currentDate.toLocaleString('default', { month: 'long' }) + ` ${year}`;
-
-            for (let i = 0; i < firstDay; i++) {
-                calendarDays.innerHTML += `<div></div>`;
+        <!-- Tab JS -->
+        <script>
+            function openTab(index) {
+                document.querySelectorAll(".tab-content").forEach((tab, i) => {
+                    tab.classList.toggle("hidden", i !== index);
+                });
             }
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isEvent = events.hasOwnProperty(dateKey);
-                const isToday = dateKey === todayKey;
+            // Clock and Date
+            function updateTimeOnly() {
+                const now = new Date();
+                const time = now.toLocaleTimeString('en-IN', {
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+                document.getElementById('time').textContent = time;
+            }
 
-                let btnClass = "bg-white/80 text-black hover:bg-blue-200";
-                if (isToday && isEvent) {
-                    btnClass = "bg-yellow-600 text-white font-bold border border-yellow-800 shadow-md hover:bg-yellow-700";
-                } else if (isToday) {
-                    btnClass = "bg-pink-600 text-white font-bold border border-black shadow-md hover:bg-purple-400";
-                } else if (isEvent) {
-                    btnClass = "bg-purple-300 text-black font-bold border border-black/50 shadow-md hover:bg-pink-700";
+            function updateDateAndDay() {
+                const now = new Date();
+                document.getElementById('date').textContent = now.toLocaleDateString('en-IN', {
+                    day: 'numeric', month: 'long', year: 'numeric'
+                });
+                document.getElementById('day').textContent = now.toLocaleDateString('en-IN', { weekday: 'long' });
+            }
+
+            updateDateAndDay();
+            updateTimeOnly();
+            setInterval(updateTimeOnly, 1000);
+            setInterval(updateDateAndDay, 60000);
+
+            // Calendar Logic
+            const events = {
+                "2025-07-25": "🗳️ Nomination Submission Deadline",
+                "2025-08-01": "📣 Campaign Starts",
+                "2025-08-10": "🗓️ Final Election Day",
+                "2025-07-30": "🗓️ Registration Closing Date"
+            };
+
+            let currentDate = new Date();
+
+            function renderCalendar() {
+                const calendarDays = document.getElementById('calendarDays');
+                const monthYear = document.getElementById('monthYear');
+                calendarDays.innerHTML = "";
+
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const todayKey = new Date().toISOString().slice(0, 10);
+
+                monthYear.textContent = currentDate.toLocaleString('default', { month: 'long' }) + ` ${year}`;
+
+                for (let i = 0; i < firstDay; i++) {
+                    calendarDays.innerHTML += `<div></div>`;
                 }
 
-                calendarDays.innerHTML += `<button onclick="showEvent('${dateKey}')" class="${btnClass} py-1 rounded-md shadow-sm">${day}</button>`;
-            }
-        }
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const isEvent = events.hasOwnProperty(dateKey);
+                    const isToday = dateKey === todayKey;
 
-        function changeMonth(offset) {
-            currentDate.setMonth(currentDate.getMonth() + offset);
+                    let btnClass = "bg-white/80 text-black hover:bg-blue-200";
+                    if (isToday && isEvent) {
+                        btnClass = "bg-yellow-600 text-white font-bold border border-yellow-800 shadow-md hover:bg-yellow-700";
+                    } else if (isToday) {
+                        btnClass = "bg-pink-600 text-white font-bold border border-black shadow-md hover:bg-purple-400";
+                    } else if (isEvent) {
+                        btnClass = "bg-purple-300 text-black font-bold border border-black/50 shadow-md hover:bg-pink-700";
+                    }
+
+                    calendarDays.innerHTML += `<button onclick="showEvent('${dateKey}')" class="${btnClass} py-1 rounded-md shadow-sm">${day}</button>`;
+                }
+            }
+
+            function changeMonth(offset) {
+                currentDate.setMonth(currentDate.getMonth() + offset);
+                renderCalendar();
+            }
+
+            function showEvent(dateKey) {
+                document.getElementById('selectedDate').textContent = new Date(dateKey).toDateString();
+                document.getElementById('eventText').textContent = events[dateKey] || "No events on this day.";
+                document.getElementById('eventView').classList.remove('hidden');
+            }
+
+            function closeEvent() {
+                document.getElementById('eventView').classList.add('hidden');
+            }
+
             renderCalendar();
-        }
-
-        function showEvent(dateKey) {
-            document.getElementById('selectedDate').textContent = new Date(dateKey).toDateString();
-            document.getElementById('eventText').textContent = events[dateKey] || "No events on this day.";
-            document.getElementById('eventView').classList.remove('hidden');
-        }
-
-        function closeEvent() {
-            document.getElementById('eventView').classList.add('hidden');
-        }
-
-        renderCalendar();
 
 
-        document.getElementById("toggleNomination").addEventListener("click", () => {
-            const form = document.getElementById("nominationForm");
-            form.classList.toggle("hidden");
-        });
-
-        document.getElementById("candidateNominationForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-            // TODO: Add your Firebase / Backend handling code here
-            alert("Nomination submitted successfully!");
-            this.reset();
-        });
-
-
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleButton = document.getElementById("toggleNomination");
-            const nominationForm = document.getElementById("nominationForm");
-            const cancelButton = document.getElementById("cancelNomination");
-            const form = document.getElementById("candidateNominationForm");
-
-            // Expand/collapse form when main button is clicked
-            if (toggleButton && nominationForm) {
-                toggleButton.addEventListener("click", () => {
-                    nominationForm.classList.toggle("hidden");
-                });
-            }
-
-            // Hide form when cancel button is clicked
-            if (cancelButton && nominationForm) {
-                cancelButton.addEventListener("click", () => {
-                    nominationForm.classList.add("hidden");
-                });
-            }
-
-            // Form submission
-            if (form) {
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    alert("Nomination submitted successfully!");
-                    form.reset();
-                    nominationForm.classList.add("hidden");
-                });
-            }
-        });
-        document.addEventListener("DOMContentLoaded", function () {
-            const toggleButton = document.getElementById("toggleNomination");
-            const nominationForm = document.getElementById("nominationForm");
-            const cancelButton = document.getElementById("cancelNomination");
-            const form = document.getElementById("candidateNominationForm");
-
-            // Expand/collapse form when main button is clicked
-            if (toggleButton && nominationForm) {
-                toggleButton.addEventListener("click", () => {
-                    nominationForm.classList.toggle("hidden");
-                });
-            }
-
-            // Hide form when cancel button is clicked
-            if (cancelButton && nominationForm) {
-                cancelButton.addEventListener("click", () => {
-                    nominationForm.classList.add("hidden");
-                });
-            }
-
-            // Form submission
-            if (form) {
-                form.addEventListener("submit", function (e) {
-                    e.preventDefault();
-                    alert("Nomination submitted successfully!");
-                    form.reset();
-                    nominationForm.classList.add("hidden");
-                });
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const viewBtn = document.getElementById("toggleViewNomination");
-            const viewSection = document.getElementById("viewNomination");
-            const formSection = document.getElementById("nominationForm");
-
-            // Toggle visibility
-            viewBtn.addEventListener("click", () => {
-                viewSection.classList.toggle("hidden");
+            document.getElementById("toggleNomination").addEventListener("click", () => {
+                const form = document.getElementById("nominationForm");
+                form.classList.toggle("hidden");
             });
 
-            // Edit nomination
-            document.getElementById("editNomination").addEventListener("click", () => {
-                // Hide view section, show form
-                viewSection.classList.add("hidden");
-                formSection.classList.remove("hidden");
-                window.scrollTo({ top: formSection.offsetTop - 80, behavior: "smooth" });
+
+        </script>
+
+        <script type="module">
+            // Firebase Imports
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+            import { getFirestore, collection, doc, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+            // Firebase Config
+            const firebaseConfig = {
+                apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
+                authDomain: "vote-edb06.firebaseapp.com",
+                projectId: "vote-edb06",
+                storageBucket: "vote-edb06.appspot.com",
+                messagingSenderId: "916721565065",
+                appId: "1:916721565065:web:2a451c1b45173d8b127558",
+            };
+
+            // Init Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const userId = localStorage.getItem("userId");
+                const userIdSpan = document.getElementById("loggedInUserId");
+
+                if (userId && userIdSpan) {
+                    userIdSpan.textContent = userId;
+                }
             });
 
-            // Cancel nomination
-            document.getElementById("cancelNomination").addEventListener("click", async () => {
-                if (confirm("Are you sure you want to cancel your nomination?")) {
-                    const user = auth.currentUser;
-                    if (user) {
-                        try {
-                            await db.collection("nominations").doc(user.uid).delete();
-                            alert("Nomination canceled.");
-                            location.reload(); // or manually update UI
-                        } catch (error) {
-                            console.error("Error cancelling nomination:", error);
-                            alert("Error cancelling nomination.");
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                const userId = localStorage.getItem("userId");
+
+                if (!userId) {
+                    alert("User not logged in.");
+                    return;
+                }
+
+                try {
+                    const q = query(collection(db, "nominations"), where("id", "==", userId));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        // Hide the nomination form
+                        const formSection = document.getElementById("nominationForm");
+                        if (formSection) formSection.classList.add("hidden");
+
+                        // Disable nomination toggle button
+                        const toggleNominationButton = document.getElementById("toggleNomination");
+                        if (toggleNominationButton) toggleNominationButton.disabled = true;
+
+                        // Show message to candidate
+                        const messageContainer = document.getElementById("nominationLimitMessage");
+                        if (messageContainer) {
+                            messageContainer.classList.remove("hidden");
+                            messageContainer.textContent = "⚠️ You have already submitted a nomination. Only one nomination is allowed per candidate.";
                         }
                     }
+                } catch (error) {
+                    console.error("Error checking existing nomination:", error);
                 }
             });
 
-            // Load nomination details
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    const docRef = db.collection("nominations").doc(user.uid);
-                    const docSnap = await docRef.get();
 
-                    if (docSnap.exists) {
-                        const data = docSnap.data();
+            // Form Submission Handler
+            const form = document.getElementById("candidateNominationForm");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const candidateId = localStorage.getItem("userId");
+
+                if (!candidateId) {
+                    alert("User not logged in.");
+                    return;
+                }
+
+                try {
+                    // Check if nomination already exists for this user
+                    const q = query(collection(db, "nominations"), where("id", "==", candidateId));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        alert("You have already submitted a nomination.");
+                        return;
+                    }
+
+                    // Prepare nomination data
+                    const nominationData = {
+                        fullName: formData.get("fullName"),
+                        dob: formData.get("dob"),
+                        qualification: formData.get("qualification"),
+                        department: formData.get("department"),
+                        post: formData.get("post"),
+                        statement: formData.get("statement"),
+                        partyName: formData.get("partyName"),
+                        symbolName: formData.get("symbolName"),
+                        status: "Submitted",
+                        id: candidateId,
+                    };
+
+                    // Add to Firestore
+                    await setDoc(doc(collection(db, "nominations")), nominationData);
+
+                    // Reset form and hide section
+                    form.reset();
+                    document.getElementById("nominationForm").classList.add("hidden");
+
+                    // Show success message
+                    const successBox = document.getElementById("successMessage");
+                    successBox.classList.remove("hidden");
+                    setTimeout(() => successBox.classList.add("hidden"), 5000);
+
+                } catch (error) {
+                    console.error("Error submitting nomination:", error);
+                    alert("An error occurred. Please try again.");
+                }
+            });
+
+            //Close Button
+            document.getElementById("closeViewNomination").addEventListener("click", () => {
+                document.getElementById("viewNomination").classList.add("hidden");
+            });
+
+            //Close Button
+            document.getElementById("closeNomination").addEventListener("click", () => {
+                document.getElementById("nominationForm").classList.add("hidden");
+            });
+
+            // Nomination Viewing
+            const userId = localStorage.getItem("userId");
+            const toggleButton = document.getElementById("toggleViewNomination");
+            const viewSection = document.getElementById("viewNomination");
+
+            if (!userId) {
+                alert("Please log in to view your nomination.");
+                window.location.href = "login.html";
+            }
+
+            toggleButton.addEventListener("click", async () => {
+                if (!viewSection.classList.contains("hidden")) {
+                    viewSection.classList.add("hidden");
+                    return;
+                }
+
+                try {
+                    const q = query(collection(db, "nominations"), where("id", "==", userId));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const data = querySnapshot.docs[0].data();
+
                         document.getElementById("viewFullName").textContent = data.fullName || "--";
                         document.getElementById("viewDepartment").textContent = data.department || "--";
                         document.getElementById("viewPost").textContent = data.post || "--";
                         document.getElementById("viewStatement").textContent = data.statement || "--";
+                        document.getElementById("viewQualification").textContent = data.qualification || "--";
+                        document.getElementById("viewPartyName").textContent = data.partyName || "--";
+                        document.getElementById("viewSymbolName").textContent = data.symbolName || "--";
+                        document.getElementById("viewDOB").textContent = data.dob || "--";
+                        document.getElementById("viewStatus").textContent = data.status || "--";
+
+                        viewSection.classList.remove("hidden");
                     } else {
-                        viewSection.innerHTML = `<p class="text-gray-500">No nomination submitted.</p>`;
+                        alert("No nomination data found.");
                     }
+                } catch (error) {
+                    console.error("Error fetching nomination data:", error);
+                    alert("Something went wrong. Please try again.");
                 }
             });
-        });
+
+            document.addEventListener("DOMContentLoaded", async () => {
+                const userId = localStorage.getItem("userId");
+                const statusDiv = document.getElementById("votingStatus");
+
+                if (!userId) {
+                    statusDiv.textContent = "User not logged in.";
+                    return;
+                }
+
+                try {
+                    const q = query(collection(db, "nominations"), where("id", "==", userId));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        const nominationData = querySnapshot.docs[0].data();
+                        const status = nominationData.status || "Not available";
+                        statusDiv.textContent = status;
+
+                        // Apply color based on status
+                        statusDiv.classList.remove("text-blue-600", "text-orange-500", "text-green-600", "text-red-600");
+
+                        switch (status.toLowerCase()) {
+                            case "submitted":
+                                statusDiv.classList.add("text-blue-600");
+                                break;
+                            case "pending":
+                                statusDiv.classList.add("text-orange-500");
+                                break;
+                            case "approved":
+                                statusDiv.classList.add("text-green-600");
+                                break;
+                            case "rejected":
+                                statusDiv.classList.add("text-red-600");
+                                break;
+                            default:
+                                statusDiv.classList.add("text-gray-500");
+                        }
+                    } else {
+                        statusDiv.textContent = "No nomination found.";
+                    }
+                } catch (error) {
+                    console.error("Error fetching nomination status:", error);
+                    statusDiv.textContent = "Error loading status.";
+                }
 
 
-    </script>
+            });
+            const candidateId = localStorage.getItem("userId"); // e.g., "c123"
+
+            if (!candidateId) {
+                alert("User not logged in.");
+            } else {
+                const candidatesRef = collection(db, "candidates");
+                const q = query(candidatesRef, where("id", "==", candidateId));
+
+                try {
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const candidateData = querySnapshot.docs[0].data();
+
+                        // Set data to the UI
+                        document.getElementById("candidateName").textContent = candidateData.fullName || "--";
+                        document.getElementById("candidateDept").textContent = candidateData.department || "--";
+                        document.getElementById("candidatePost").textContent = candidateData.post || "--";
+                        document.getElementById("candidateStatus").textContent = candidateData.status || "--";
+
+                        document.getElementById("profileName").textContent = candidateData.fullName || "Candidate Name";
+                        document.getElementById("profileDept").textContent = candidateData.department || "Department";
+                    } else {
+                        alert("No matching candidate found.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching candidate data:", error);
+                }
+            }
+        </script>
+
+        </script>
 
 
-    <!-- Scrollbar -->
-    <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
-        }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #ec4899;
-            border-radius: 3px;
-        }
-    </style>
+
+
+
+
+
+
+        <!-- Scrollbar -->
+        <style>
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 5px;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #ec4899;
+                border-radius: 3px;
+            }
+        </style>
 </body>
 
 </html>
