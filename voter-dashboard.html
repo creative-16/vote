@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Voter Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- firebase-init.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
+            authDomain: "vote-edb06.firebaseapp.com",
+            projectId: "vote-edb06",
+            storageBucket: "vote-edb06.appspot.com",
+            messagingSenderId: "916721565065",
+            appId: "1:916721565065:web:2a451c1b45173d8b127558",
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
 </head>
 
 <body
@@ -154,7 +171,7 @@
                 <div class="bg-gray-100 p-6 rounded-lg shadow space-y-4 text-gray-700">
                     <div class="bg-white shadow-lg rounded-xl p-6">
 
-                        <p class="text-green-700 font-semibold">✅ Your profile has been successfully created!</p>
+
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><strong>Full Name:</strong> Abhishek Sharma</div>
@@ -227,14 +244,32 @@
         setInterval(updateTimeOnly, 1000);
         setInterval(updateDateAndDay, 60000);
 
-        // Calendar Logic
-        const events = {
-            "2025-07-25": "🗳️ Nomination Submission Deadline",
-            "2025-08-01": "📣 Campaign Starts",
-            "2025-08-10": "🗓️ Final Election Day",
-            "2025-07-30": "🗓️ Registration Closing Date"
-        };
+        let db;
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        db = firebase.firestore();
+        const events = {}; // Will be filled dynamically
 
+        // Fetch events from Firestore
+        async function fetchEventsFromFirestore() {
+            try {
+                const snapshot = await db.collection("events").get();
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const date = data.date;       // format: "2025-08-15"
+                    const title = data.title;     // example: "Review"
+                    if (date && title) {
+                        events[date] = `📌 ${title}`;
+                    }
+                });
+                renderCalendar(); // Only render after events are loaded
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            }
+        }
+
+        // Calendar logic remains mostly the same
         let currentDate = new Date();
 
         function renderCalendar() {
@@ -287,7 +322,55 @@
             document.getElementById('eventView').classList.add('hidden');
         }
 
-        renderCalendar();
+        document.addEventListener("DOMContentLoaded", async () => {
+            const announcementList = document.getElementById("announcementList");
+            if (!announcementList) return;
+
+            try {
+
+                const snapshot = await db.collection("announcements").orderBy("createdAt", "desc").get();
+
+
+                // Clear existing
+                announcementList.innerHTML = "";
+
+                if (snapshot.empty) {
+                    const div = document.createElement("div");
+                    div.className = "bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700";
+                    div.textContent = "📭 No announcements yet.";
+                    announcementList.appendChild(div);
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+
+                    const div = document.createElement("div");
+                    div.className = "bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700";
+
+                    // Handle undefined category gracefully
+                    let prefix = "📢";
+                    const category = (data.category || "").toLowerCase();
+                    if (category === "warning") prefix = "⚠️";
+                    else if (category === "info") prefix = "ℹ️";
+                    else if (category === "update") prefix = "🆕";
+                    else if (category === "deadline") prefix = "📌";
+                    else if (category === "reminder") prefix = "🔔";
+
+                    div.textContent = `${prefix} ${data.text || "No announcement text."}`;
+                    announcementList.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Error fetching announcements:", error);
+                const div = document.createElement("div");
+                div.className = "bg-red-100 p-3 rounded-lg shadow text-sm text-red-700";
+                div.textContent = "⚠️ Failed to load announcements.";
+                announcementList.appendChild(div);
+            }
+            await fetchEventsFromFirestore(); // 🔥 This is the missing call!
+        });
+
+
     </script>
 
     <!-- Scrollbar -->
