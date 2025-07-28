@@ -491,32 +491,12 @@
 
         renderCalendar();
     </script>
-
-
-
-
-
-    <!-- Scrollbar -->
-    <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #ec4899;
-            border-radius: 3px;
-        }
-    </style>
-
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-
         document.addEventListener("DOMContentLoaded", () => {
-
-            // Friend's Firebase configuration
+            // Firebase config
             const friendConfig = {
                 apiKey: "AIzaSyAHoG37dUL-vF9u-fkSFXIj7QhcotNVolI",
                 authDomain: "election-e2ead.firebaseapp.com",
@@ -530,23 +510,22 @@
             const eventApp = initializeApp(friendConfig, "eventApp");
             const eventDB = getFirestore(eventApp);
 
-            // Reference to the form
             const form = document.getElementById("eventForm");
 
             form.addEventListener("submit", async (e) => {
                 e.preventDefault();
 
-                // Get input values
                 const title = document.getElementById("eventTitle").value.trim();
                 const date = document.getElementById("eventDate").value;
                 const startTime = document.getElementById("startTime").value;
                 const endTime = document.getElementById("endTime").value;
                 const description = document.getElementById("eventDescription").value.trim();
 
-                console.log({ title, date, startTime, endTime, description }); // 🔍 Debug log
+                // 🔍 Debug log
+                console.log("Form values:", { title, date, startTime, endTime, description });
 
-                // Basic validation
                 if (!title || !date || !startTime || !endTime) {
+                    console.warn("❗ Missing fields");
                     alert("Please fill all required fields.");
                     return;
                 }
@@ -564,16 +543,33 @@
                     const docRef = await addDoc(collection(eventDB, "events"), eventData);
                     alert("🎉 Event added successfully! ID: " + docRef.id);
                     form.reset();
-                    toggleEventForm?.(false); // If toggleEventForm exists
+                    toggleEventForm?.(false);
                 } catch (error) {
                     console.error("❌ Error adding event:", error);
                     alert("Failed to add event. Please try again.");
                 }
             });
-
-            // Similarly handle announcementForm if needed
         });
     </script>
+
+
+
+
+
+    <!-- Scrollbar -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #ec4899;
+            border-radius: 3px;
+        }
+    </style>
+
+
+
 </body>
 
 </html>
