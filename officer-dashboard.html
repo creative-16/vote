@@ -492,93 +492,8 @@
         renderCalendar();
     </script>
 
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-        // Friend's Firebase configuration (replace with real values)
-        const friendConfig = {
-            apiKey: "AIzaSyAHoG37dUL-vF9u-fkSFXIj7QhcotNVolI",
-  authDomain: "election-e2ead.firebaseapp.com",
-  projectId: "election-e2ead",
-  storageBucket: "election-e2ead.firebasestorage.app",
-  messagingSenderId: "673457735304",
-  appId: "1:673457735304:web:16cf5ee59f615468eb413d"
-};
 
-        // Initialize Firebase for friend's project
-        const eventApp = initializeApp(friendConfig, "eventApp");
-        const eventDB = getFirestore(eventApp);
-
-        // Get reference to the form
-        const form = document.getElementById("eventForm");
-
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            // Get input values
-            const title = document.getElementById("eventTitle").value.trim();
-            const date = document.getElementById("eventDate").value;
-            const startTime = document.getElementById("startTime").value;
-            const endTime = document.getElementById("endTime").value;
-            const description = document.getElementById("eventDescription").value.trim();
-
-            // Compose event data
-            const eventData = {
-                title,
-                date,
-                startTime,
-                endTime,
-                description,
-                createdAt: new Date()
-            };
-
-            try {
-                const docRef = await addDoc(collection(eventDB, "events"), eventData);
-                alert("🎉 Event added successfully! ID: " + docRef.id);
-                form.reset(); // Clear the form
-                toggleEventForm(false); // Optionally hide the form
-            } catch (error) {
-                console.error("❌ Error adding event:", error);
-                alert("Failed to add event. Please try again.");
-            }
-        });
-
-        // Handle Announcement Form Submission
-        const announcementForm = document.getElementById("announcementForm");
-
-        announcementForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            // Get form values
-            const category = announcementForm.querySelector("select").value;
-            const message = announcementForm.querySelector("textarea").value.trim();
-
-            // Basic validation
-            if (!category || !message) {
-                alert("Please fill all required fields.");
-                return;
-            }
-
-            // Prepare data object
-            const announcementData = {
-                category,
-                message,
-                createdAt: new Date()
-            };
-
-            try {
-                const docRef = await addDoc(collection(eventDB, "announcements"), announcementData);
-                alert("📢 Announcement added successfully! ID: " + docRef.id);
-                announcementForm.reset();
-                toggleAnnouncementForm(false);
-            } catch (error) {
-                console.error("❌ Error adding announcement:", error);
-                alert("Failed to add announcement. Please try again.");
-            }
-        });       
-    </script>
 
 
     <!-- Scrollbar -->
@@ -592,6 +507,73 @@
             border-radius: 3px;
         }
     </style>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // Friend's Firebase configuration
+            const friendConfig = {
+                apiKey: "AIzaSyAHoG37dUL-vF9u-fkSFXIj7QhcotNVolI",
+                authDomain: "election-e2ead.firebaseapp.com",
+                projectId: "election-e2ead",
+                storageBucket: "election-e2ead.firebasestorage.app",
+                messagingSenderId: "673457735304",
+                appId: "1:673457735304:web:16cf5ee59f615468eb413d"
+            };
+
+            // Initialize Firebase
+            const eventApp = initializeApp(friendConfig, "eventApp");
+            const eventDB = getFirestore(eventApp);
+
+            // Reference to the form
+            const form = document.getElementById("eventForm");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                // Get input values
+                const title = document.getElementById("eventTitle").value.trim();
+                const date = document.getElementById("eventDate").value;
+                const startTime = document.getElementById("startTime").value;
+                const endTime = document.getElementById("endTime").value;
+                const description = document.getElementById("eventDescription").value.trim();
+
+                console.log({ title, date, startTime, endTime, description }); // 🔍 Debug log
+
+                // Basic validation
+                if (!title || !date || !startTime || !endTime) {
+                    alert("Please fill all required fields.");
+                    return;
+                }
+
+                const eventData = {
+                    title,
+                    date,
+                    startTime,
+                    endTime,
+                    description,
+                    createdAt: new Date()
+                };
+
+                try {
+                    const docRef = await addDoc(collection(eventDB, "events"), eventData);
+                    alert("🎉 Event added successfully! ID: " + docRef.id);
+                    form.reset();
+                    toggleEventForm?.(false); // If toggleEventForm exists
+                } catch (error) {
+                    console.error("❌ Error adding event:", error);
+                    alert("Failed to add event. Please try again.");
+                }
+            });
+
+            // Similarly handle announcementForm if needed
+        });
+    </script>
 </body>
 
 </html>
