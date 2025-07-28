@@ -491,66 +491,6 @@
 
         renderCalendar();
     </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // Firebase config
-            const friendConfig = {
-                apiKey: "AIzaSyAHoG37dUL-vF9u-fkSFXIj7QhcotNVolI",
-                authDomain: "election-e2ead.firebaseapp.com",
-                projectId: "election-e2ead",
-                storageBucket: "election-e2ead.firebasestorage.app",
-                messagingSenderId: "673457735304",
-                appId: "1:673457735304:web:16cf5ee59f615468eb413d"
-            };
-
-            // Initialize Firebase
-            const eventApp = initializeApp(friendConfig, "eventApp");
-            const eventDB = getFirestore(eventApp);
-
-            const form = document.getElementById("eventForm");
-
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                const title = document.getElementById("eventTitle").value.trim();
-                const date = document.getElementById("eventDate").value;
-                const startTime = document.getElementById("startTime").value;
-                const endTime = document.getElementById("endTime").value;
-                const description = document.getElementById("eventDescription").value.trim();
-
-                // 🔍 Debug log
-                console.log("Form values:", { title, date, startTime, endTime, description });
-
-                if (!title || !date || !startTime || !endTime) {
-                    console.warn("❗ Missing fields");
-                    alert("Please fill all required fields.");
-                    return;
-                }
-
-                const eventData = {
-                    title,
-                    date,
-                    startTime,
-                    endTime,
-                    description,
-                    createdAt: new Date()
-                };
-
-                try {
-                    const docRef = await addDoc(collection(eventDB, "events"), eventData);
-                    alert("🎉 Event added successfully! ID: " + docRef.id);
-                    form.reset();
-                    toggleEventForm?.(false);
-                } catch (error) {
-                    console.error("❌ Error adding event:", error);
-                    alert("Failed to add event. Please try again.");
-                }
-            });
-        });
-    </script>
 
 
 
@@ -568,6 +508,63 @@
         }
     </style>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const firebaseConfig = {
+                apiKey: "AIzaSyAHoG37dUL-vF9u-fkSFXIj7QhcotNVolI",
+                authDomain: "election-e2ead.firebaseapp.com",
+                projectId: "election-e2ead",
+                storageBucket: "election-e2ead.firebasestorage.app",
+                messagingSenderId: "673457735304",
+                appId: "1:673457735304:web:16cf5ee59f615468eb413d"
+            };
+
+            const app = firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore(app);
+
+            const form = document.getElementById("eventForm");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const title = document.getElementById("eventTitle").value.trim();
+                const date = document.getElementById("eventDate").value;
+                const startTime = document.getElementById("startTime").value;
+                const endTime = document.getElementById("endTime").value;
+                const description = document.getElementById("eventDescription").value.trim();
+
+                console.log("Captured:", { title, date, startTime, endTime, description });
+
+                if (!title || !date || !startTime || !endTime) {
+                    alert("Please fill all required fields.");
+                    return;
+                }
+
+                const eventData = {
+                    title,
+                    date,
+                    startTime,
+                    endTime,
+                    description,
+                    createdAt: new Date()
+                };
+
+                try {
+                    const docRef = await db.collection("events").add(eventData);
+                    alert("🎉 Event added successfully! ID: " + docRef.id);
+                    form.reset();
+                    toggleEventForm?.(false);
+                } catch (err) {
+                    console.error("Error adding event:", err);
+                    alert("Error writing to database.");
+                }
+            });
+        });
+    </script>
 
 
 </body>
