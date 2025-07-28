@@ -6,6 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Official Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- firebase-init.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
+            authDomain: "vote-edb06.firebaseapp.com",
+            projectId: "vote-edb06",
+            storageBucket: "vote-edb06.appspot.com",
+            messagingSenderId: "916721565065",
+            appId: "1:916721565065:web:2a451c1b45173d8b127558",
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+
 </head>
 
 <body
@@ -101,33 +119,16 @@
                     </div>
                 </div>
 
-                <script type="module">
-                    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-                    import {
-                        getFirestore,
-                        collection,
-                        getDocs,
-                        updateDoc,
-                        doc,
-                        getDoc,
-                        setDoc,
-                    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
-                        authDomain: "vote-edb06.firebaseapp.com",
-                        projectId: "vote-edb06",
-                        storageBucket: "vote-edb06.appspot.com",
-                        messagingSenderId: "916721565065",
-                        appId: "1:916721565065:web:2a451c1b45173d8b127558",
-                    };
-
-                    const app = initializeApp(firebaseConfig);
-                    const db = getFirestore(app);
+                <script>
+                    let db;
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    db = firebase.firestore();
 
                     async function loadNominations() {
-                        const nominationsCol = collection(db, "nominations");
-                        const nominationsSnapshot = await getDocs(nominationsCol);
+                        const nominationsSnapshot = await db.collection("nominations").get();
                         const listContainer = document.getElementById("nominationList");
                         listContainer.innerHTML = "";
 
@@ -144,49 +145,46 @@
                             card.className = "bg-white rounded-xl shadow-md p-4 border flex flex-col gap-2";
 
                             card.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="text-xl font-semibold text-black">${data.fullName || "undefined"}</h3>
-                        <p class="text-gray-500">${data.department || ""}</p>
-                        <p class="text-gray-600">Post: ${data.post || ""}</p>
-                    </div>
-                    <span class="px-3 py-1 text-sm rounded-full ${statusColor} capitalize">${data.status}</span>
-                </div>
-                <div class="flex gap-2 mt-3">
-                    <button onclick="markReview('${docSnap.id}')"
-                        class="bg-white text-yellow-700 px-4 py-1 rounded border border-yellow-500 hover:bg-yellow-50">Review</button>
-                    <button onclick="updateStatus('${docSnap.id}', 'approved')"
-                        class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">Approve</button>
-                    <button onclick="updateStatus('${docSnap.id}', 'rejected')"
-                        class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700">Reject</button>
-                </div>
-                `;
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-black">${data.fullName || "undefined"}</h3>
+                                        <p class="text-gray-500">${data.department || ""}</p>
+                                        <p class="text-gray-600">Post: ${data.post || ""}</p>
+                                    </div>
+                                    <span class="px-3 py-1 text-sm rounded-full ${statusColor} capitalize">${data.status}</span>
+                                </div>
+                                <div class="flex gap-2 mt-3">
+                                    <button onclick="markReview('${docSnap.id}')"
+                                        class="bg-white text-yellow-700 px-4 py-1 rounded border border-yellow-500 hover:bg-yellow-50">Review</button>
+                                    <button onclick="updateStatus('${docSnap.id}', 'approved')"
+                                        class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">Approve</button>
+                                    <button onclick="updateStatus('${docSnap.id}', 'rejected')"
+                                        class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700">Reject</button>
+                                </div>
+                            `;
                             listContainer.appendChild(card);
                         });
                     }
 
                     window.markReview = async function (id) {
-                        const nominationRef = doc(db, "nominations", id);
-                        await updateDoc(nominationRef, { status: "pending" });
+                        const nominationRef = db.collection("nominations").doc(id);
+                        await nominationRef.update({ status: "pending" });
                         loadNominations();
                     };
 
                     window.updateStatus = async function (id, newStatus) {
                         try {
-                            const nominationRef = doc(db, "nominations", id);
-                            await updateDoc(nominationRef, { status: newStatus });
+                            const nominationRef = db.collection("nominations").doc(id);
+                            await nominationRef.update({ status: newStatus });
 
                             if (newStatus === "approved") {
-                                const nominationSnap = await getDoc(nominationRef);
+                                const nominationSnap = await nominationRef.get();
                                 const data = nominationSnap.data();
 
-                                // Find candidate where field "id" matches nomination "id"
-                                const candidatesCol = collection(db, "candidates");
-                                const querySnapshot = await getDocs(candidatesCol);
-
+                                const candidatesSnapshot = await db.collection("candidates").get();
                                 let matchedCandidateDocId = null;
 
-                                querySnapshot.forEach((docSnap) => {
+                                candidatesSnapshot.forEach((docSnap) => {
                                     const candidateData = docSnap.data();
                                     if (candidateData.id === data.id) {
                                         matchedCandidateDocId = docSnap.id;
@@ -194,8 +192,8 @@
                                 });
 
                                 if (matchedCandidateDocId) {
-                                    const candidateRef = doc(db, "candidates", matchedCandidateDocId);
-                                    await updateDoc(candidateRef, {
+                                    const candidateRef = db.collection("candidates").doc(matchedCandidateDocId);
+                                    await candidateRef.update({
                                         fullName: data.fullName || "",
                                         dob: data.dob || "",
                                         department: data.department || "",
@@ -212,16 +210,16 @@
                                 }
                             }
 
-                            await loadNominations(); // Refresh the list
+                            await loadNominations();
                         } catch (err) {
                             console.error("❌ Error updating nomination:", err);
                         }
                     };
 
-
-                    // Initial load
+                    // Load initially
                     loadNominations();
                 </script>
+
 
 
 
@@ -246,48 +244,27 @@
                         <!-- Event Form -->
                         <div id="eventFormSection" class="hidden transition-all duration-300 ease-in-out mt-6">
                             <div class="bg-white shadow-xl rounded-2xl p-4 max-w-3xl mx-auto text-black">
-                                <form class="space-y-4" id="eventForm">
+                                <form id="eventForm" class="space-y-4">
                                     <div>
-                                        <label class="block text-gray-700 font-semibold mb-1">Event Title</label>
-                                        <input type="text" id="eventTitle"
-                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-                                            placeholder="Enter event title" required />
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">📌 Event Title
+                                            *</label>
+                                        <input type="text" id="eventTitle" required
+                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:border-blue-500" />
                                     </div>
+
                                     <div>
-                                        <label class="block text-gray-700 font-semibold mb-1">Event Date</label>
-                                        <input type="date" id="eventDate"
-                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-                                            required />
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">📅 Event Date
+                                            *</label>
+                                        <input type="date" id="eventDate" required
+                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:border-blue-500" />
                                     </div>
-                                    <div class="flex gap-4">
-                                        <div class="flex-1">
-                                            <label class="block text-gray-700 font-semibold mb-1">Start Time</label>
-                                            <input type="time" id="startTime"
-                                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-                                                required />
-                                        </div>
-                                        <div class="flex-1">
-                                            <label class="block text-gray-700 font-semibold mb-1">End Time</label>
-                                            <input type="time" id="endTime"
-                                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-                                                required />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-gray-700 font-semibold mb-1">Description</label>
-                                        <textarea id="eventDescription" rows="3"
-                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300"
-                                            placeholder="Write a short description (optional)"></textarea>
-                                    </div>
-                                    <div class="flex justify-center gap-4 pt-2">
-                                        <button type="submit"
-                                            class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200">
-                                            Add Event
-                                        </button>
+
+                                    <div class="flex justify-end space-x-3">
                                         <button type="button" onclick="toggleEventForm(false)"
-                                            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200">
-                                            Cancel
-                                        </button>
+                                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-medium">Cancel</button>
+                                        <button type="submit"
+                                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">Add
+                                            Event</button>
                                     </div>
                                 </form>
                             </div>
@@ -362,11 +339,7 @@
                         }
                     }
 
-                    document.getElementById("eventForm").addEventListener("submit", function (e) {
-                        e.preventDefault();
-                        alert("Event added successfully!");
-                        toggleEventForm(false);
-                    });
+
 
                     function toggleAnnouncementForm(show) {
                         const formSection = document.getElementById("announcementFormSection");
@@ -382,11 +355,6 @@
                         }
                     }
 
-                    document.getElementById("announcementForm").addEventListener("submit", function (e) {
-                        e.preventDefault();
-                        alert("Announcement posted successfully!");
-                        toggleAnnouncementForm(false);
-                    });
                 </script>
             </div>
 
@@ -429,14 +397,27 @@
         setInterval(updateTimeOnly, 1000);
         setInterval(updateDateAndDay, 60000);
 
-        // Calendar Logic
-        const events = {
-            "2025-07-25": "🗳️ Nomination Submission Deadline",
-            "2025-08-01": "📣 Campaign Starts",
-            "2025-08-10": "🗓️ Final Election Day",
-            "2025-07-30": "🗓️ Registration Closing Date"
-        };
+        const events = {}; // Will be filled dynamically
 
+        // Fetch events from Firestore
+        async function fetchEventsFromFirestore() {
+            try {
+                const snapshot = await db.collection("events").get();
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const date = data.date;       // format: "2025-08-15"
+                    const title = data.title;     // example: "Review"
+                    if (date && title) {
+                        events[date] = `📌 ${title}`;
+                    }
+                });
+                renderCalendar(); // Only render after events are loaded
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            }
+        }
+
+        // Calendar logic remains mostly the same
         let currentDate = new Date();
 
         function renderCalendar() {
@@ -489,8 +470,81 @@
             document.getElementById('eventView').classList.add('hidden');
         }
 
-        renderCalendar();
+        // Initial fetch
+        fetchEventsFromFirestore();
     </script>
+
+    <script>
+        const eventForm = document.getElementById("eventForm");
+
+        eventForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById("eventTitle").value.trim();
+            const date = document.getElementById("eventDate").value;
+
+            if (!title || !date) {
+                alert("⚠️ Please fill both event title and date.");
+                return;
+            }
+
+            try {
+                await db.collection("events").add({
+                    title,
+                    date,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+
+                alert("✅ Event added successfully!");
+                eventForm.reset();
+                toggleEventForm(false);
+                await fetchEventsFromFirestore(); // refresh the calendar
+            } catch (error) {
+                console.error("❌ Firestore Error:", error);
+                alert("❌ Error saving event: " + error.message);
+            }
+        });
+
+        function toggleEventForm(show) {
+            const section = document.getElementById("eventFormSection");
+            if (!section) return;
+            section.classList.toggle("hidden", !show);
+        }
+    </script>
+
+    <script>
+        // Handle Announcement Form Submission
+        const announcementForm = document.getElementById("announcementForm");
+
+        announcementForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Get form values
+            const category = announcementForm.querySelector("select").value;
+            const announcementText = announcementForm.querySelector("textarea").value;
+
+            // Optional: Add a timestamp
+            const createdAt = new Date();
+
+            try {
+                await db.collection("announcements").add({
+                    category: category,
+                    text: announcementText,
+                    createdAt: createdAt.toISOString()
+                });
+
+                alert("📢 Announcement submitted successfully!");
+                announcementForm.reset();
+                toggleAnnouncementForm(false); // This will close the form
+            } catch (error) {
+                console.error("❌ Error adding announcement:", error);
+                alert("Failed to submit announcement. Please try again.");
+            }
+        });
+    </script>
+
+
+
 
 
 
@@ -507,64 +561,6 @@
             border-radius: 3px;
         }
     </style>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const firebaseConfig = {
-                apiKey: "AIzaSyAHoG37dUL-vF9u-fkSFXIj7QhcotNVolI",
-                authDomain: "election-e2ead.firebaseapp.com",
-                projectId: "election-e2ead",
-                storageBucket: "election-e2ead.firebasestorage.app",
-                messagingSenderId: "673457735304",
-                appId: "1:673457735304:web:16cf5ee59f615468eb413d"
-            };
-
-            const app = firebase.initializeApp(firebaseConfig);
-            const db = firebase.firestore(app);
-
-            const form = document.getElementById("eventForm");
-
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                const title = document.getElementById("eventTitle").value.trim();
-                const date = document.getElementById("eventDate").value;
-                const startTime = document.getElementById("startTime").value;
-                const endTime = document.getElementById("endTime").value;
-                const description = document.getElementById("eventDescription").value.trim();
-
-                console.log("Captured:", { title, date, startTime, endTime, description });
-
-                if (!title || !date || !startTime || !endTime) {
-                    alert("Please fill all required fields.");
-                    return;
-                }
-
-                const eventData = {
-                    title,
-                    date,
-                    startTime,
-                    endTime,
-                    description,
-                    createdAt: new Date()
-                };
-
-                try {
-                    const docRef = await db.collection("events").add(eventData);
-                    alert("🎉 Event added successfully! ID: " + docRef.id);
-                    form.reset();
-                    toggleEventForm?.(false);
-                } catch (err) {
-                    console.error("Error adding event:", err);
-                    alert("Error writing to database.");
-                }
-            });
-        });
-    </script>
 
 
 </body>
