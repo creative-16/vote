@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Candidate Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- firebase-init.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
+            authDomain: "vote-edb06.firebaseapp.com",
+            projectId: "vote-edb06",
+            storageBucket: "vote-edb06.appspot.com",
+            messagingSenderId: "916721565065",
+            appId: "1:916721565065:web:2a451c1b45173d8b127558",
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
 </head>
 
 <body
@@ -76,18 +93,11 @@
                             </div>
                             <div id="announcementList"
                                 class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
-                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to
-                                    iElect Platform!
-                                </div>
-                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day is
-                                    approaching.
-                                </div>
-                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination
-                                    deadline: July
-                                    25th</div>
+                                <!-- Announcements will be dynamically injected here -->
                             </div>
                         </div>
                     </div>
+
 
                     <!-- Right Column: Calendar -->
                     <div class="flex flex-col gap-4">
@@ -408,14 +418,32 @@
             setInterval(updateTimeOnly, 1000);
             setInterval(updateDateAndDay, 60000);
 
-            // Calendar Logic
-            const events = {
-                "2025-07-25": "🗳️ Nomination Submission Deadline",
-                "2025-08-01": "📣 Campaign Starts",
-                "2025-08-10": "🗓️ Final Election Day",
-                "2025-07-30": "🗓️ Registration Closing Date"
-            };
+            let db;
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            db = firebase.firestore();
+            const events = {}; // Will be filled dynamically
 
+            // Fetch events from Firestore
+            async function fetchEventsFromFirestore() {
+                try {
+                    const snapshot = await db.collection("events").get();
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const date = data.date;       // format: "2025-08-15"
+                        const title = data.title;     // example: "Review"
+                        if (date && title) {
+                            events[date] = `📌 ${title}`;
+                        }
+                    });
+                    renderCalendar(); // Only render after events are loaded
+                } catch (error) {
+                    console.error("Error fetching events:", error);
+                }
+            }
+
+            // Calendar logic remains mostly the same
             let currentDate = new Date();
 
             function renderCalendar() {
@@ -468,7 +496,55 @@
                 document.getElementById('eventView').classList.add('hidden');
             }
 
-            renderCalendar();
+            document.addEventListener("DOMContentLoaded", async () => {
+                const announcementList = document.getElementById("announcementList");
+                if (!announcementList) return;
+
+                try {
+
+                    const snapshot = await db.collection("announcements").orderBy("createdAt", "desc").get();
+
+
+                    // Clear existing
+                    announcementList.innerHTML = "";
+
+                    if (snapshot.empty) {
+                        const div = document.createElement("div");
+                        div.className = "bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700";
+                        div.textContent = "📭 No announcements yet.";
+                        announcementList.appendChild(div);
+                        return;
+                    }
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+
+                        const div = document.createElement("div");
+                        div.className = "bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700";
+
+                        // Handle undefined category gracefully
+                        let prefix = "📢";
+                        const category = (data.category || "").toLowerCase();
+                        if (category === "warning") prefix = "⚠️";
+                        else if (category === "info") prefix = "ℹ️";
+                        else if (category === "update") prefix = "🆕";
+                        else if (category === "deadline") prefix = "📌";
+                        else if (category === "reminder") prefix = "🔔";
+
+                        div.textContent = `${prefix} ${data.text || "No announcement text."}`;
+                        announcementList.appendChild(div);
+                    });
+                } catch (error) {
+                    console.error("Error fetching announcements:", error);
+                    const div = document.createElement("div");
+                    div.className = "bg-red-100 p-3 rounded-lg shadow text-sm text-red-700";
+                    div.textContent = "⚠️ Failed to load announcements.";
+                    announcementList.appendChild(div);
+                }
+            });
+
+            // Initial fetch
+            fetchEventsFromFirestore();
 
 
             document.getElementById("toggleNomination").addEventListener("click", () => {
@@ -479,259 +555,148 @@
 
         </script>
 
-        <script type="module">
-            // Firebase Imports
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-            import { getFirestore, collection, doc, setDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-            // Firebase Config
-            const firebaseConfig = {
-                apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
-                authDomain: "vote-edb06.firebaseapp.com",
-                projectId: "vote-edb06",
-                storageBucket: "vote-edb06.appspot.com",
-                messagingSenderId: "916721565065",
-                appId: "1:916721565065:web:2a451c1b45173d8b127558",
-            };
-
-            // Init Firebase
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-
-            document.addEventListener("DOMContentLoaded", () => {
-                const userId = localStorage.getItem("userId");
-                const userIdSpan = document.getElementById("loggedInUserId");
-
-                if (userId && userIdSpan) {
-                    userIdSpan.textContent = userId;
-                }
-            });
-
-
+        <script>
             document.addEventListener("DOMContentLoaded", async () => {
                 const userId = localStorage.getItem("userId");
+                const span = document.getElementById("loggedInUserId");
+                if (userId && span) span.textContent = userId;
 
-                if (!userId) {
-                    alert("User not logged in.");
-                    return;
-                }
+                if (!userId) return alert("User not logged in.");
 
+                // Check for existing nomination
                 try {
-                    const q = query(collection(db, "nominations"), where("id", "==", userId));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        // Hide the nomination form
-                        const formSection = document.getElementById("nominationForm");
-                        if (formSection) formSection.classList.add("hidden");
-
-                        // Disable nomination toggle button
-                        const toggleNominationButton = document.getElementById("toggleNomination");
-                        if (toggleNominationButton) toggleNominationButton.disabled = true;
-
-                        // Show message to candidate
-                        const messageContainer = document.getElementById("nominationLimitMessage");
-                        if (messageContainer) {
-                            messageContainer.classList.remove("hidden");
-                            messageContainer.textContent = "⚠️ You have already submitted a nomination. Only one nomination is allowed per candidate.";
+                    const snapshot = await db.collection("nominations").where("id", "==", userId).get();
+                    if (!snapshot.empty) {
+                        document.getElementById("nominationForm")?.classList.add("hidden");
+                        const toggleBtn = document.getElementById("toggleNomination");
+                        if (toggleBtn) toggleBtn.disabled = true;
+                        const msg = document.getElementById("nominationLimitMessage");
+                        if (msg) {
+                            msg.classList.remove("hidden");
+                            msg.textContent = "⚠️ You have already submitted a nomination. Only one nomination is allowed per candidate.";
                         }
                     }
-                } catch (error) {
-                    console.error("Error checking existing nomination:", error);
-                }
-            });
-
-
-            // Form Submission Handler
-            const form = document.getElementById("candidateNominationForm");
-
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                const formData = new FormData(form);
-                const candidateId = localStorage.getItem("userId");
-
-                if (!candidateId) {
-                    alert("User not logged in.");
-                    return;
+                } catch (e) {
+                    console.error("Error checking existing nomination:", e);
                 }
 
+                // Display nomination status
+                const statusDiv = document.getElementById("votingStatus");
+                if (!userId) return (statusDiv.textContent = "User not logged in.");
                 try {
-                    // Check if nomination already exists for this user
-                    const q = query(collection(db, "nominations"), where("id", "==", candidateId));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        alert("You have already submitted a nomination.");
-                        return;
+                    const snapshot = await db.collection("nominations").where("id", "==", userId).get();
+                    if (!snapshot.empty) {
+                        const status = snapshot.docs[0].data().status || "Not available";
+                        statusDiv.textContent = status;
+                        statusDiv.classList.remove("text-blue-600", "text-orange-500", "text-green-600", "text-red-600");
+                        const color = {
+                            submitted: "text-blue-600",
+                            pending: "text-orange-500",
+                            approved: "text-green-600",
+                            rejected: "text-red-600"
+                        }[status.toLowerCase()] || "text-gray-500";
+                        statusDiv.classList.add(color);
+                    } else {
+                        statusDiv.textContent = "No nomination found.";
                     }
+                } catch (e) {
+                    console.error("Error fetching nomination status:", e);
+                    statusDiv.textContent = "Error loading status.";
+                }
 
-                    // Prepare nomination data
-                    const nominationData = {
-                        fullName: formData.get("fullName"),
-                        dob: formData.get("dob"),
-                        qualification: formData.get("qualification"),
-                        department: formData.get("department"),
-                        post: formData.get("post"),
-                        statement: formData.get("statement"),
-                        partyName: formData.get("partyName"),
-                        symbolName: formData.get("symbolName"),
-                        status: "Submitted",
-                        id: candidateId,
-                    };
-
-                    // Add to Firestore
-                    await setDoc(doc(collection(db, "nominations")), nominationData);
-
-                    // Reset form and hide section
-                    form.reset();
-                    document.getElementById("nominationForm").classList.add("hidden");
-
-                    // Show success message
-                    const successBox = document.getElementById("successMessage");
-                    successBox.classList.remove("hidden");
-                    setTimeout(() => successBox.classList.add("hidden"), 5000);
-
-                } catch (error) {
-                    console.error("Error submitting nomination:", error);
-                    alert("An error occurred. Please try again.");
+                // Candidate profile info
+                try {
+                    const cSnap = await db.collection("candidates").where("id", "==", userId).get();
+                    if (!cSnap.empty) {
+                        const d = cSnap.docs[0].data();
+                        const set = (id, val) => (document.getElementById(id).textContent = val || "--");
+                        set("candidateName", d.fullName);
+                        set("candidateDept", d.department);
+                        set("candidatePost", d.post);
+                        set("candidateStatus", d.status);
+                        set("profileName", d.fullName || "Candidate Name");
+                        set("profileDept", d.department || "Department");
+                    } else alert("No matching candidate found.");
+                } catch (e) {
+                    console.error("Error fetching candidate data:", e);
                 }
             });
 
-            //Close Button
-            document.getElementById("closeViewNomination").addEventListener("click", () => {
+            document.getElementById("closeViewNomination")?.addEventListener("click", () => {
                 document.getElementById("viewNomination").classList.add("hidden");
             });
 
-            //Close Button
-            document.getElementById("closeNomination").addEventListener("click", () => {
+            document.getElementById("closeNomination")?.addEventListener("click", () => {
                 document.getElementById("nominationForm").classList.add("hidden");
             });
 
-            // Nomination Viewing
-            const userId = localStorage.getItem("userId");
-            const toggleButton = document.getElementById("toggleViewNomination");
-            const viewSection = document.getElementById("viewNomination");
-
-            if (!userId) {
-                alert("Please log in to view your nomination.");
-                window.location.href = "login.html";
-            }
-
-            toggleButton.addEventListener("click", async () => {
-                if (!viewSection.classList.contains("hidden")) {
-                    viewSection.classList.add("hidden");
-                    return;
-                }
+            document.getElementById("toggleViewNomination")?.addEventListener("click", async () => {
+                const userId = localStorage.getItem("userId");
+                const view = document.getElementById("viewNomination");
+                if (!userId) return alert("Please log in to view your nomination.");
+                if (!view.classList.contains("hidden")) return view.classList.add("hidden");
 
                 try {
-                    const q = query(collection(db, "nominations"), where("id", "==", userId));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        const data = querySnapshot.docs[0].data();
-
-                        document.getElementById("viewFullName").textContent = data.fullName || "--";
-                        document.getElementById("viewDepartment").textContent = data.department || "--";
-                        document.getElementById("viewPost").textContent = data.post || "--";
-                        document.getElementById("viewStatement").textContent = data.statement || "--";
-                        document.getElementById("viewQualification").textContent = data.qualification || "--";
-                        document.getElementById("viewPartyName").textContent = data.partyName || "--";
-                        document.getElementById("viewSymbolName").textContent = data.symbolName || "--";
-                        document.getElementById("viewDOB").textContent = data.dob || "--";
-                        document.getElementById("viewStatus").textContent = data.status || "--";
-
-                        viewSection.classList.remove("hidden");
+                    const snapshot = await db.collection("nominations").where("id", "==", userId).get();
+                    if (!snapshot.empty) {
+                        const d = snapshot.docs[0].data();
+                        const set = (id, val) => (document.getElementById(id).textContent = val || "--");
+                        set("viewFullName", d.fullName);
+                        set("viewDepartment", d.department);
+                        set("viewPost", d.post);
+                        set("viewStatement", d.statement);
+                        set("viewQualification", d.qualification);
+                        set("viewPartyName", d.partyName);
+                        set("viewSymbolName", d.symbolName);
+                        set("viewDOB", d.dob);
+                        set("viewStatus", d.status);
+                        view.classList.remove("hidden");
                     } else {
                         alert("No nomination data found.");
                     }
-                } catch (error) {
-                    console.error("Error fetching nomination data:", error);
+                } catch (e) {
+                    console.error("Error fetching nomination data:", e);
                     alert("Something went wrong. Please try again.");
                 }
             });
 
-            document.addEventListener("DOMContentLoaded", async () => {
-                const userId = localStorage.getItem("userId");
-                const statusDiv = document.getElementById("votingStatus");
-
-                if (!userId) {
-                    statusDiv.textContent = "User not logged in.";
-                    return;
-                }
+            document.getElementById("candidateNominationForm")?.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const data = new FormData(form);
+                const id = localStorage.getItem("userId");
+                if (!id) return alert("User not logged in.");
 
                 try {
-                    const q = query(collection(db, "nominations"), where("id", "==", userId));
-                    const querySnapshot = await getDocs(q);
+                    const snap = await db.collection("nominations").where("id", "==", id).get();
+                    if (!snap.empty) return alert("You have already submitted a nomination.");
 
-                    if (!querySnapshot.empty) {
-                        const nominationData = querySnapshot.docs[0].data();
-                        const status = nominationData.status || "Not available";
-                        statusDiv.textContent = status;
+                    const nomination = {
+                        fullName: data.get("fullName"),
+                        dob: data.get("dob"),
+                        qualification: data.get("qualification"),
+                        department: data.get("department"),
+                        post: data.get("post"),
+                        statement: data.get("statement"),
+                        partyName: data.get("partyName"),
+                        symbolName: data.get("symbolName"),
+                        status: "Submitted",
+                        id
+                    };
 
-                        // Apply color based on status
-                        statusDiv.classList.remove("text-blue-600", "text-orange-500", "text-green-600", "text-red-600");
+                    await db.collection("nominations").add(nomination);
 
-                        switch (status.toLowerCase()) {
-                            case "submitted":
-                                statusDiv.classList.add("text-blue-600");
-                                break;
-                            case "pending":
-                                statusDiv.classList.add("text-orange-500");
-                                break;
-                            case "approved":
-                                statusDiv.classList.add("text-green-600");
-                                break;
-                            case "rejected":
-                                statusDiv.classList.add("text-red-600");
-                                break;
-                            default:
-                                statusDiv.classList.add("text-gray-500");
-                        }
-                    } else {
-                        statusDiv.textContent = "No nomination found.";
-                    }
-                } catch (error) {
-                    console.error("Error fetching nomination status:", error);
-                    statusDiv.textContent = "Error loading status.";
+                    form.reset();
+                    document.getElementById("nominationForm").classList.add("hidden");
+                    const successBox = document.getElementById("successMessage");
+                    successBox.classList.remove("hidden");
+                    setTimeout(() => successBox.classList.add("hidden"), 5000);
+                } catch (e) {
+                    console.error("Error submitting nomination:", e);
+                    alert("An error occurred. Please try again.");
                 }
-
-
             });
-            const candidateId = localStorage.getItem("userId"); // e.g., "c123"
-
-            if (!candidateId) {
-                alert("User not logged in.");
-            } else {
-                const candidatesRef = collection(db, "candidates");
-                const q = query(candidatesRef, where("id", "==", candidateId));
-
-                try {
-                    const querySnapshot = await getDocs(q);
-                    if (!querySnapshot.empty) {
-                        const candidateData = querySnapshot.docs[0].data();
-
-                        // Set data to the UI
-                        document.getElementById("candidateName").textContent = candidateData.fullName || "--";
-                        document.getElementById("candidateDept").textContent = candidateData.department || "--";
-                        document.getElementById("candidatePost").textContent = candidateData.post || "--";
-                        document.getElementById("candidateStatus").textContent = candidateData.status || "--";
-
-                        document.getElementById("profileName").textContent = candidateData.fullName || "Candidate Name";
-                        document.getElementById("profileDept").textContent = candidateData.department || "Department";
-                    } else {
-                        alert("No matching candidate found.");
-                    }
-                } catch (error) {
-                    console.error("Error fetching candidate data:", error);
-                }
-            }
         </script>
-
-        </script>
-
-
-
 
 
 
