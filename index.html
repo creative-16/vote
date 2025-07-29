@@ -168,14 +168,15 @@
             const snapshot = await getDocs(q);
 
             if (!snapshot.empty) {
-                localStorage.setItem("userId", id);        // Save candidate ID
-                localStorage.setItem("userRole", role);    // Optional: save role
+                sessionStorage.setItem("userId", id);        // Save candidate ID
+                sessionStorage.setItem("userRole", role);    // Optional: save role
                 window.location.href = `${role}-dashboard.html`;
             } else {
                 alert("Invalid ID or Passcode");
             }
 
         };
+
     </script>
 
 
