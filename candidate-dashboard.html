@@ -27,366 +27,371 @@
 
 <body
     class="bg-gradient-to-br from-pink-100 via-pink-200 to-pink-300 min-h-screen flex items-center justify-center p-4">
+    <div id="dashboardContent" style="display: none;">
 
-    <!-- Main Container -->
-    <div
-        class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
-
-        <!-- Sidebar -->
+        <!-- Main Container -->
         <div
-            class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
-            <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
-            <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
-            <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
-        </div>
+            class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
 
-        <!-- Content -->
-        <div
-            class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
-
-            <!-- Tab 0 -->
-            <!-- Tab 0 -->
-            <div id="tab-0" class="tab-content h-full flex flex-col">
-                <h2 class="text-white text-2xl font-bold mb-4">Candidate Dashboard</h2>
-
-                <!-- Responsive Grid Layout -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
-
-                    <!-- Left Column: Profile, Clock, Voting Status -->
-                    <div class="flex flex-col gap-4">
-                        <!-- Profile Overview Section -->
-                        <div id="profileCard"
-                            class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
-                            onclick="openTab(2)">
-                            <div class="flex items-center gap-3">
-                                <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-800" id="profileName">Candidate Name</h3>
-                                    <p class="text-sm text-gray-500" id="profileDept">Department</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Clock -->
-                        <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
-                            <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
-                            <div class="text-3xl font-semibold" id="time"></div>
-                            <div class="text-lg mt-1 text-gray-600" id="day"></div>
-                        </div>
-
-                        <!-- Nimination Status Section -->
-                        <div class="bg-white shadow-lg rounded-xl p-4">
-                            <h2 class="text-lg font-semibold text-gray-800 mb-2">Nomination Status</h2>
-                            <div id="votingStatus" class="text-blue-600 font-medium text-md">
-                                Loading status...
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Middle Column: Announcements -->
-                    <div class="flex flex-col gap-4">
-                        <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-full overflow-hidden">
-                            <div class="flex items-center justify-between mb-2">
-                                <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements
-                                </h2>
-                                <span class="text-xs text-gray-500">Latest Updates</span>
-                            </div>
-                            <div id="announcementList"
-                                class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
-                                <!-- Announcements will be dynamically injected here -->
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- Right Column: Calendar -->
-                    <div class="flex flex-col gap-4">
-                        <div class="bg-white/70 rounded-2xl p-4 shadow-md relative h-full">
-                            <div id="calendarContainer" class="text-black-800 w-full h-auto">
-                                <div id="calendarView" class="flex flex-col">
-                                    <!-- Header -->
-                                    <div class="flex justify-between items-center mb-3">
-                                        <button onclick="changeMonth(-1)"
-                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
-                                        <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
-                                        <button onclick="changeMonth(1)"
-                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
-                                    </div>
-
-                                    <!-- Week Days -->
-                                    <div
-                                        class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
-                                        <div>Sun</div>
-                                        <div>Mon</div>
-                                        <div>Tue</div>
-                                        <div>Wed</div>
-                                        <div>Thu</div>
-                                        <div>Fri</div>
-                                        <div>Sat</div>
-                                    </div>
-
-                                    <!-- Days -->
-                                    <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
-                                    </div>
-                                </div>
-
-                                <!-- Event Detail -->
-                                <div id="eventView"
-                                    class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
-                                    <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
-                                            id="selectedDate"></span>
-                                    </h3>
-                                    <p id="eventText" class="text-gray-700 text-center mb-4"></p>
-                                    <button onclick="closeEvent()"
-                                        class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
-                                        Back to Calendar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Sidebar -->
+            <div
+                class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
+                <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
+                <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
+                <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
             </div>
 
+            <!-- Content -->
+            <div
+                class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
 
-            <!-- Tab 1 -->
-            <div id="tab-1" class="tab-content hidden text-white">
-                <h2 class="text-2xl font-bold mb-2">📝 Nomination Section</h2>
-                <!-- Nomination Submission Section -->
-                <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-8">
-                    <div id="successMessage"
-                        class="hidden mt-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg shadow-md text-center transition-all duration-300">
-                        🎉 Nomination submitted successfully!
+                <!-- Tab 0 -->
+                <!-- Tab 0 -->
+                <div id="tab-0" class="tab-content h-full flex flex-col">
+                    <h2 class="text-white text-2xl font-bold mb-4">Candidate Dashboard</h2>
+
+                    <!-- Responsive Grid Layout -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
+
+                        <!-- Left Column: Profile, Clock, Voting Status -->
+                        <div class="flex flex-col gap-4">
+                            <!-- Profile Overview Section -->
+                            <div id="profileCard"
+                                class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
+                                onclick="openTab(2)">
+                                <div class="flex items-center gap-3">
+                                    <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-800" id="profileName">Candidate Name
+                                        </h3>
+                                        <p class="text-sm text-gray-500" id="profileDept">Department</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Clock -->
+                            <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
+                                <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
+                                <div class="text-3xl font-semibold" id="time"></div>
+                                <div class="text-lg mt-1 text-gray-600" id="day"></div>
+                            </div>
+
+                            <!-- Nimination Status Section -->
+                            <div class="bg-white shadow-lg rounded-xl p-4">
+                                <h2 class="text-lg font-semibold text-gray-800 mb-2">Nomination Status</h2>
+                                <div id="votingStatus" class="text-blue-600 font-medium text-md">
+                                    Loading status...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle Column: Announcements -->
+                        <div class="flex flex-col gap-4">
+                            <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-full overflow-hidden">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements
+                                    </h2>
+                                    <span class="text-xs text-gray-500">Latest Updates</span>
+                                </div>
+                                <div id="announcementList"
+                                    class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
+                                    <!-- Announcements will be dynamically injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Right Column: Calendar -->
+                        <div class="flex flex-col gap-4">
+                            <div class="bg-white/70 rounded-2xl p-4 shadow-md relative h-full">
+                                <div id="calendarContainer" class="text-black-800 w-full h-auto">
+                                    <div id="calendarView" class="flex flex-col">
+                                        <!-- Header -->
+                                        <div class="flex justify-between items-center mb-3">
+                                            <button onclick="changeMonth(-1)"
+                                                class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
+                                            <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
+                                            <button onclick="changeMonth(1)"
+                                                class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
+                                        </div>
+
+                                        <!-- Week Days -->
+                                        <div
+                                            class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
+                                            <div>Sun</div>
+                                            <div>Mon</div>
+                                            <div>Tue</div>
+                                            <div>Wed</div>
+                                            <div>Thu</div>
+                                            <div>Fri</div>
+                                            <div>Sat</div>
+                                        </div>
+
+                                        <!-- Days -->
+                                        <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
+                                        </div>
+                                    </div>
+
+                                    <!-- Event Detail -->
+                                    <div id="eventView"
+                                        class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
+                                        <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
+                                                id="selectedDate"></span>
+                                        </h3>
+                                        <p id="eventText" class="text-gray-700 text-center mb-4"></p>
+                                        <button onclick="closeEvent()"
+                                            class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
+                                            Back to Calendar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div id="nominationLimitMessage" class="hidden text-red-600 font-semibold mb-4"></div>
-
-
-                    <div class="flex justify-center"><button id="toggleNomination"
-                            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                            Nomination
-                        </button></div>
-
-                    <div id="nominationForm" class="mt-6 hidden transition-all duration-300 text-black">
-                        <form id="candidateNominationForm" class="space-y-4">
-                            <!-- Full Name -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Full Name</label>
-                                <input type="text" name="fullName"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    required>
-                            </div>
-
-                            <!-- Date of Birth -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Date of Birth</label>
-                                <input type="date" name="dob"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    required>
-                            </div>
-
-                            <!-- Qualification -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Qualification</label>
-                                <input type="text" name="qualification"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
-                            </div>
-
-                            <!-- Department / Class -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Department / Class</label>
-                                <input type="text" name="department"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
-                            </div>
-
-                            <!-- Post Applying For -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Post Applying For</label>
-                                <select name="post"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                                    required>
-                                    <option value="">-- Select Post --</option>
-                                    <option value="President">President</option>
-                                    <option value="Vice President">Vice President</option>
-                                    <option value="Secretary">Secretary</option>
-                                    <option value="Treasurer">Treasurer</option>
-                                </select>
-                            </div>
-
-                            <!-- Nomination Statement -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Nomination Statement</label>
-                                <textarea name="statement" class="w-full border border-gray-300 rounded-lg px-3 py-2"
-                                    rows="4" required placeholder="Why should you be elected?"></textarea>
-                            </div>
-
-                            <!-- Party Name -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Party Name</label>
-                                <input type="text" name="partyName"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
-                            </div>
-
-                            <!-- Party Symbol Name -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Party Symbol Name</label>
-                                <input type="text" name="symbolName"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
-                            </div>
-
-                            <!-- Upload Candidate Photo -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Upload Profile Photo<span
-                                        class="text-xs text-gray-500">(Recommended: square, 400x400px)</span></label>
-                                <label
-                                    class="w-full flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-100 transition">
-                                    <input type="file" name="photo" accept="image/*" class="hidden">
-                                    <span class="text-gray-600">Choose a file</span>
-                                </label>
-                            </div>
-
-                            <!-- Upload Symbol Image -->
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Upload Party Symbol Image <span
-                                        class="text-xs text-gray-500">(Recommended: square, 200x200px)</span></label>
-                                <label
-                                    class="w-full flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-100 transition">
-                                    <input type="file" name="symbolImage" accept="image/*" class="hidden">
-                                    <span class="text-gray-600">Choose a symbol image</span>
-                                </label>
-                            </div>
-
-                            <!-- Buttons -->
-                            <div class="flex justify-end gap-3 mt-4">
-                                <button type="submit"
-                                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
-                                    Submit Nomination
-                                </button>
-                                <button type="button" id="closeNomination"
-                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-
                 </div>
-                <!-- View Nomination Section -->
-                <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-6">
-                    <!-- Toggle Button -->
-                    <div class="flex justify-center">
-                        <button id="toggleViewNomination"
-                            class="bg-purple-700 text-white px-5 py-2 rounded-xl hover:bg-purple-600 transition duration-200 shadow-md">
-                            View Submitted Nomination
-                        </button>
+
+
+                <!-- Tab 1 -->
+                <div id="tab-1" class="tab-content hidden text-white">
+                    <h2 class="text-2xl font-bold mb-2">📝 Nomination Section</h2>
+                    <!-- Nomination Submission Section -->
+                    <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-8">
+                        <div id="successMessage"
+                            class="hidden mt-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded-lg shadow-md text-center transition-all duration-300">
+                            🎉 Nomination submitted successfully!
+                        </div>
+
+                        <div id="nominationLimitMessage" class="hidden text-red-600 font-semibold mb-4"></div>
+
+
+                        <div class="flex justify-center"><button id="toggleNomination"
+                                class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                                Nomination
+                            </button></div>
+
+                        <div id="nominationForm" class="mt-6 hidden transition-all duration-300 text-black">
+                            <form id="candidateNominationForm" class="space-y-4">
+                                <!-- Full Name -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Full Name</label>
+                                    <input type="text" name="fullName"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        required>
+                                </div>
+
+                                <!-- Date of Birth -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Date of Birth</label>
+                                    <input type="date" name="dob"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        required>
+                                </div>
+
+                                <!-- Qualification -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Qualification</label>
+                                    <input type="text" name="qualification"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                                </div>
+
+                                <!-- Department / Class -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Department / Class</label>
+                                    <input type="text" name="department"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                                </div>
+
+                                <!-- Post Applying For -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Post Applying For</label>
+                                    <select name="post"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-800 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                        required>
+                                        <option value="">-- Select Post --</option>
+                                        <option value="President">President</option>
+                                        <option value="Vice President">Vice President</option>
+                                        <option value="Secretary">Secretary</option>
+                                        <option value="Treasurer">Treasurer</option>
+                                    </select>
+                                </div>
+
+                                <!-- Nomination Statement -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Nomination Statement</label>
+                                    <textarea name="statement"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2" rows="4" required
+                                        placeholder="Why should you be elected?"></textarea>
+                                </div>
+
+                                <!-- Party Name -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Party Name</label>
+                                    <input type="text" name="partyName"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                                </div>
+
+                                <!-- Party Symbol Name -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Party Symbol Name</label>
+                                    <input type="text" name="symbolName"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                                </div>
+
+                                <!-- Upload Candidate Photo -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Upload Profile Photo<span
+                                            class="text-xs text-gray-500">(Recommended: square,
+                                            400x400px)</span></label>
+                                    <label
+                                        class="w-full flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-100 transition">
+                                        <input type="file" name="photo" accept="image/*" class="hidden">
+                                        <span class="text-gray-600">Choose a file</span>
+                                    </label>
+                                </div>
+
+                                <!-- Upload Symbol Image -->
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Upload Party Symbol Image <span
+                                            class="text-xs text-gray-500">(Recommended: square,
+                                            200x200px)</span></label>
+                                    <label
+                                        class="w-full flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white cursor-pointer hover:bg-gray-100 transition">
+                                        <input type="file" name="symbolImage" accept="image/*" class="hidden">
+                                        <span class="text-gray-600">Choose a symbol image</span>
+                                    </label>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="flex justify-end gap-3 mt-4">
+                                    <button type="submit"
+                                        class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                                        Submit Nomination
+                                    </button>
+                                    <button type="button" id="closeNomination"
+                                        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+
                     </div>
-
-                    <!-- Nomination Details -->
-                    <div id="viewNomination" class="mt-6 hidden space-y-6 border-t pt-6 border-gray-300">
-
-                        <!-- Basic Info -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="font-semibold text-gray-500">Full Name</label>
-                                <p id="viewFullName" class="text-gray-800 text-lg font-medium">--</p>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-gray-500">Department / Class</label>
-                                <p id="viewDepartment" class="text-gray-800 text-lg font-medium">--</p>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-gray-500">Post Applying For</label>
-                                <p id="viewPost" class="text-gray-800 text-lg font-medium">--</p>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="font-semibold text-gray-500">Nomination Statement</label>
-                                <p id="viewStatement"
-                                    class="text-gray-800 text-base leading-relaxed bg-gray-50 p-3 rounded-xl shadow-inner">
-                                    --</p>
-                            </div>
-                        </div>
-
-                        <!-- Additional Details -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="font-semibold text-gray-500">Qualification</label>
-                                <p id="viewQualification" class="text-gray-800 text-base">--</p>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-gray-500">Party Name</label>
-                                <p id="viewPartyName" class="text-gray-800 text-base">--</p>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-gray-500">Symbol Name</label>
-                                <p id="viewSymbolName" class="text-gray-800 text-base">--</p>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-gray-500">Date of Birth</label>
-                                <p id="viewDOB" class="text-gray-800 text-base">--</p>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-gray-500">Status</label>
-                                <p id="viewStatus" class="text-gray-800 font-semibold">--</p>
-                            </div>
-                        </div>
-
-                        <!-- Close Button (separate from toggle) -->
-                        <div class="flex justify-end">
-                            <button id="closeViewNomination"
-                                class="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition duration-200 shadow">
-                                Close
+                    <!-- View Nomination Section -->
+                    <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto mt-6">
+                        <!-- Toggle Button -->
+                        <div class="flex justify-center">
+                            <button id="toggleViewNomination"
+                                class="bg-purple-700 text-white px-5 py-2 rounded-xl hover:bg-purple-600 transition duration-200 shadow-md">
+                                View Submitted Nomination
                             </button>
                         </div>
 
-                    </div>
-                </div>
+                        <!-- Nomination Details -->
+                        <div id="viewNomination" class="mt-6 hidden space-y-6 border-t pt-6 border-gray-300">
 
-            </div>
-            <!-- Tab 2 -->
-            <div id="tab-2" class="tab-content hidden text-white">
-                <h2 class="text-2xl font-bold mb-4">👤 Profile</h2>
-
-                <!-- View Profile Section -->
-                <div class="bg-white/50 p-4 rounded-lg shadow space-y-6 text-gray-700">
-                    <div class="bg-white shadow-lg rounded-xl p-6 space-y-4">
-                        <h2 class="text-xl font-semibold text-gray-800">Candidate Profile</h2>
-                        <div class="flex items-center space-x-6">
-                            <!-- Profile Picture Placeholder -->
-                            <div
-                                class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-sm">
-                                Profile
+                            <!-- Basic Info -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="font-semibold text-gray-500">Full Name</label>
+                                    <p id="viewFullName" class="text-gray-800 text-lg font-medium">--</p>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-gray-500">Department / Class</label>
+                                    <p id="viewDepartment" class="text-gray-800 text-lg font-medium">--</p>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-gray-500">Post Applying For</label>
+                                    <p id="viewPost" class="text-gray-800 text-lg font-medium">--</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="font-semibold text-gray-500">Nomination Statement</label>
+                                    <p id="viewStatement"
+                                        class="text-gray-800 text-base leading-relaxed bg-gray-50 p-3 rounded-xl shadow-inner">
+                                        --</p>
+                                </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                                <div><strong>Name:</strong> <span id="candidateName">--</span></div>
-                                <div><strong>Department:</strong> <span id="candidateDept">--</span></div>
-                                <div><strong>Post:</strong> <span id="candidatePost">--</span></div>
-                                <div><strong>Status:</strong> <span id="candidateStatus">--</span></div>
+
+                            <!-- Additional Details -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="font-semibold text-gray-500">Qualification</label>
+                                    <p id="viewQualification" class="text-gray-800 text-base">--</p>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-gray-500">Party Name</label>
+                                    <p id="viewPartyName" class="text-gray-800 text-base">--</p>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-gray-500">Symbol Name</label>
+                                    <p id="viewSymbolName" class="text-gray-800 text-base">--</p>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-gray-500">Date of Birth</label>
+                                    <p id="viewDOB" class="text-gray-800 text-base">--</p>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-gray-500">Status</label>
+                                    <p id="viewStatus" class="text-gray-800 font-semibold">--</p>
+                                </div>
+                            </div>
+
+                            <!-- Close Button (separate from toggle) -->
+                            <div class="flex justify-end">
+                                <button id="closeViewNomination"
+                                    class="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition duration-200 shadow">
+                                    Close
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- Tab 2 -->
+                <div id="tab-2" class="tab-content hidden text-white">
+                    <h2 class="text-2xl font-bold mb-4">👤 Profile</h2>
+
+                    <!-- View Profile Section -->
+                    <div class="bg-white/50 p-4 rounded-lg shadow space-y-6 text-gray-700">
+                        <div class="bg-white shadow-lg rounded-xl p-6 space-y-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Candidate Profile</h2>
+                            <div class="flex items-center space-x-6">
+                                <!-- Profile Picture Placeholder -->
+                                <div
+                                    class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-sm">
+                                    Profile
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                                    <div><strong>Name:</strong> <span id="candidateName">--</span></div>
+                                    <div><strong>Department:</strong> <span id="candidateDept">--</span></div>
+                                    <div><strong>Post:</strong> <span id="candidatePost">--</span></div>
+                                    <div><strong>Status:</strong> <span id="candidateStatus">--</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
 
 
-                <!-- Go to Dashboard Button -->
-                <div class="flex justify-center mt-4">
-                    <a href="candidate-dashboard.html">
-                        <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
-                            Go to Dashboard
-                        </button>
-                    </a>
-                </div>
+                    <!-- Go to Dashboard Button -->
+                    <div class="flex justify-center mt-4">
+                        <a href="candidate-dashboard.html">
+                            <button class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+                                Go to Dashboard
+                            </button>
+                        </a>
+                    </div>
 
-                <!-- Section: Future Additions -->
-                <div class="bg-gray-100 shadow-inner rounded-xl p-6 mt-6">
-                    <h2 class="text-xl font-bold text-gray-500 mb-2">📌 Additional Options (Coming Soon)</h2>
-                    <p class="text-sm text-gray-400 italic">More voter profile tools will be added here soon.</p>
+                    <!-- Section: Future Additions -->
+                    <div class="bg-gray-100 shadow-inner rounded-xl p-6 mt-6">
+                        <h2 class="text-xl font-bold text-gray-500 mb-2">📌 Additional Options (Coming Soon)</h2>
+                        <p class="text-sm text-gray-400 italic">More voter profile tools will be added here soon.</p>
+                    </div>
                 </div>
             </div>
+
+
         </div>
-
-
-
 
         <!-- Tab JS -->
         <script>
@@ -557,7 +562,7 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", async () => {
-                const userId = localStorage.getItem("userId");
+                const userId = sessionStorage.getItem("userId");
                 const span = document.getElementById("loggedInUserId");
                 if (userId && span) span.textContent = userId;
 
@@ -631,7 +636,7 @@
             });
 
             document.getElementById("toggleViewNomination")?.addEventListener("click", async () => {
-                const userId = localStorage.getItem("userId");
+                const userId = sessionStorage.getItem("userId");
                 const view = document.getElementById("viewNomination");
                 if (!userId) return alert("Please log in to view your nomination.");
                 if (!view.classList.contains("hidden")) return view.classList.add("hidden");
@@ -664,7 +669,7 @@
                 e.preventDefault();
                 const form = e.target;
                 const data = new FormData(form);
-                const id = localStorage.getItem("userId");
+                const id = sessionStorage.getItem("userId");
                 if (!id) return alert("User not logged in.");
 
                 try {
@@ -714,6 +719,9 @@
                 border-radius: 3px;
             }
         </style>
+
+        <script src="auth-guard.js"></script>
+
 </body>
 
 </html>
