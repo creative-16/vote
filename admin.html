@@ -20,16 +20,19 @@
 
     <script>
         function adminLogin() {
-            const id = document.getElementById('admin-id').value.trim();
+            const id = document.getElementById('admin-id').value.trim().toLowerCase();
             const pass = document.getElementById('admin-passcode').value.trim();
 
-            // 🔐 Replace with your real credentials or Firebase logic
+            // 🔐 Simple hardcoded login check
             if (id === "admin" && pass === "masterkey") {
+                sessionStorage.setItem("userId", id);
+                sessionStorage.setItem("userRole", "admin"); // ✅ lowercase and matches auth-guard
                 window.location.href = "admin-dashboard.html";
             } else {
                 alert("Invalid Admin Credentials");
             }
         }
+
     </script>
 </body>
 
