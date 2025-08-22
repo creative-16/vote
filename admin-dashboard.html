@@ -6,327 +6,242 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #dashboardContent {
+            display: none;
+            /* hidden by default */
+        }
+
+        body.logged-out main {
+            display: none;
+        }
+    </style>
+
 </head>
 
 <body
     class="bg-gradient-to-br from-pink-100 via-pink-200 to-pink-300 min-h-screen flex items-center justify-center p-4">
-    <div id="dashboardContent" style="display: none;">
 
-        <!-- Main Container -->
+
+    <!-- Main Container -->
+    <div
+        class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
+
+        <!-- Sidebar -->
         <div
-            class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
+            class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
+            <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
+            <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
+            <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
+        </div>
 
-            <!-- Sidebar -->
-            <div
-                class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
-                <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
-                <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
-                <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
+        <!-- Content -->
+        <div
+            class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
+
+            <!-- Tab 0 -->
+            <!-- Tab 0 -->
+            <div id="tab-0" class="tab-content h-full flex flex-col">
+                <h2 class="text-white text-2xl font-bold mb-4">Admin Dashboard</h2>
+
+                <!-- Responsive Grid Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
+
+                    <!-- Left Column: Profile, Clock, Voting Status -->
+                    <div class="flex flex-col gap-4">
+                        <!-- Profile Overview Section -->
+                        <div id="profileCard"
+                            class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
+                            onclick="openTab(2)">
+                            <div class="flex items-center gap-3">
+                                <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800" id="profileName">Admin</h3>
+                                    <p class="text-sm text-gray-500" id="profileDept">Election Commission</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clock -->
+                        <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
+                            <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
+                            <div class="text-3xl font-semibold" id="time"></div>
+                            <div class="text-lg mt-1 text-gray-600" id="day"></div>
+                        </div>
+
+                        <!-- Voting Status Section -->
+                        <div class="bg-white shadow-lg rounded-xl p-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-2">Election Status</h2>
+                            <div id="votingStatus" class="text-blue-600 font-medium text-md">
+                                Loading status...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column: Announcements -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-full overflow-hidden">
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements
+                                </h2>
+                                <span class="text-xs text-gray-500">Latest Updates</span>
+                            </div>
+                            <div id="announcementList"
+                                class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to
+                                    iElect Platform!
+                                </div>
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day
+                                    is
+                                    approaching.
+                                </div>
+                                <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination
+                                    deadline: July
+                                    25th</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Calendar -->
+                    <div class="flex flex-col gap-4">
+                        <div class="bg-white/70 rounded-2xl p-4 shadow-md relative h-full">
+                            <div id="calendarContainer" class="text-black-800 w-full h-auto">
+                                <div id="calendarView" class="flex flex-col">
+                                    <!-- Header -->
+                                    <div class="flex justify-between items-center mb-3">
+                                        <button onclick="changeMonth(-1)"
+                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
+                                        <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
+                                        <button onclick="changeMonth(1)"
+                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
+                                    </div>
+
+                                    <!-- Week Days -->
+                                    <div
+                                        class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
+                                        <div>Sun</div>
+                                        <div>Mon</div>
+                                        <div>Tue</div>
+                                        <div>Wed</div>
+                                        <div>Thu</div>
+                                        <div>Fri</div>
+                                        <div>Sat</div>
+                                    </div>
+
+                                    <!-- Days -->
+                                    <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
+                                    </div>
+                                </div>
+
+                                <!-- Event Detail -->
+                                <div id="eventView"
+                                    class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
+                                    <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
+                                            id="selectedDate"></span>
+                                    </h3>
+                                    <p id="eventText" class="text-gray-700 text-center mb-4"></p>
+                                    <button onclick="closeEvent()"
+                                        class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
+                                        Back to Calendar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Content -->
-            <div
-                class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
 
-                <!-- Tab 0 -->
-                <!-- Tab 0 -->
-                <div id="tab-0" class="tab-content h-full flex flex-col">
-                    <h2 class="text-white text-2xl font-bold mb-4">Admin Dashboard</h2>
-
-                    <!-- Responsive Grid Layout -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
-
-                        <!-- Left Column: Profile, Clock, Voting Status -->
-                        <div class="flex flex-col gap-4">
-                            <!-- Profile Overview Section -->
-                            <div id="profileCard"
-                                class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
-                                onclick="openTab(2)">
-                                <div class="flex items-center gap-3">
-                                    <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-800" id="profileName">Admin</h3>
-                                        <p class="text-sm text-gray-500" id="profileDept">Election Commission</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Clock -->
-                            <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
-                                <div class="text-center text-gray-600">🗓️ <span id="date"></span></div>
-                                <div class="text-3xl font-semibold" id="time"></div>
-                                <div class="text-lg mt-1 text-gray-600" id="day"></div>
-                            </div>
-
-                            <!-- Voting Status Section -->
-                            <div class="bg-white shadow-lg rounded-xl p-4">
-                                <h2 class="text-lg font-semibold text-gray-800 mb-2">Election Status</h2>
-                                <div id="votingStatus" class="text-blue-600 font-medium text-md">
-                                    Loading status...
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Middle Column: Announcements -->
-                        <div class="flex flex-col gap-4">
-                            <div class="bg-white/90 rounded-2xl p-4 shadow-md flex flex-col h-full overflow-hidden">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h2 class="text-lg font-bold text-pink-600 flex items-center gap-2">📢 Announcements
-                                    </h2>
-                                    <span class="text-xs text-gray-500">Latest Updates</span>
-                                </div>
-                                <div id="announcementList"
-                                    class="space-y-2 overflow-y-auto pr-1 custom-scrollbar flex-grow max-h-[250px]">
-                                    <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">🆕 Welcome to
-                                        iElect Platform!
-                                    </div>
-                                    <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">⚠️ Election day
-                                        is
-                                        approaching.
-                                    </div>
-                                    <div class="bg-pink-100 p-3 rounded-lg shadow text-sm text-gray-700">📌 Nomination
-                                        deadline: July
-                                        25th</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: Calendar -->
-                        <div class="flex flex-col gap-4">
-                            <div class="bg-white/70 rounded-2xl p-4 shadow-md relative h-full">
-                                <div id="calendarContainer" class="text-black-800 w-full h-auto">
-                                    <div id="calendarView" class="flex flex-col">
-                                        <!-- Header -->
-                                        <div class="flex justify-between items-center mb-3">
-                                            <button onclick="changeMonth(-1)"
-                                                class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
-                                            <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
-                                            <button onclick="changeMonth(1)"
-                                                class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
-                                        </div>
-
-                                        <!-- Week Days -->
-                                        <div
-                                            class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
-                                            <div>Sun</div>
-                                            <div>Mon</div>
-                                            <div>Tue</div>
-                                            <div>Wed</div>
-                                            <div>Thu</div>
-                                            <div>Fri</div>
-                                            <div>Sat</div>
-                                        </div>
-
-                                        <!-- Days -->
-                                        <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
-                                        </div>
-                                    </div>
-
-                                    <!-- Event Detail -->
-                                    <div id="eventView"
-                                        class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
-                                        <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
-                                                id="selectedDate"></span>
-                                        </h3>
-                                        <p id="eventText" class="text-gray-700 text-center mb-4"></p>
-                                        <button onclick="closeEvent()"
-                                            class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
-                                            Back to Calendar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Tab 1 -->
-                <div id="tab-1" class="tab-content hidden text-white">
-                    <h2 class="text-2xl font-bold mb-2">📝 Nomination Section</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Voter Dashboard -->
-                        <div class="bg-white p-2 rounded-2xl shadow-md">
-                            <h2 class="text-xl font-bold mb-3">Voter Dashboard</h2>
-                            <p class="text-sm text-gray-600 mb-3">Access the entire voter system and controls.</p>
-                            <a href="voter-dashboard.html"
-                                class="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg">Go to
-                                Voter</a>
-                        </div>
-
-                        <!-- Candidate Dashboard -->
-                        <div class="bg-white p-2 rounded-2xl shadow-md">
-                            <h2 class="text-xl font-bold mb-3">Candidate Dashboard</h2>
-                            <p class="text-sm text-gray-600 mb-3">Manage candidate data and controls.</p>
-                            <a href="candidate-dashboard.html"
-                                class="inline-block bg-green-500 text-white px-4 py-2 rounded-lg">Go
-                                to Candidate</a>
-                        </div>
-
-                        <!-- Officer Dashboard -->
-                        <div class="bg-white p-2 rounded-2xl shadow-md">
-                            <h2 class="text-xl font-bold mb-3">Officer Dashboard</h2>
-                            <p class="text-sm text-gray-600 mb-3">Monitor officers and announcements.</p>
-                            <a href="officer-dashboard.html"
-                                class="inline-block bg-purple-500 text-white px-4 py-2 rounded-lg">Go
-                                to Officer</a>
-                        </div>
-
-                        <!-- Database Viewer (optional future use) -->
-                        <div class="bg-white p-2 rounded-2xl shadow-md">
-                            <h2 class="text-xl font-bold mb-3">Database Viewer</h2>
-                            <p class="text-sm text-gray-600 mb-3">View all voter/candidate/officer records.</p>
-                            <button onclick="alert('Feature coming soon')"
-                                class="bg-yellow-500 text-white px-4 py-2 rounded-lg">Coming
-                                Soon</button>
-                        </div>
-
-                        <!-- Site Stats (optional) -->
-                        <div class="bg-white p-2 rounded-2xl shadow-md">
-                            <h2 class="text-xl font-bold mb-3">Site Statistics</h2>
-                            <p class="text-sm text-gray-600 mb-3">Visual overview of system usage.</p>
-                            <button onclick="alert('Analytics not set up yet')"
-                                class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Coming
-                                Soon</button>
-                        </div>
+            <!-- Tab 1 -->
+            <div id="tab-1" class="tab-content hidden text-white">
+                <h2 class="text-2xl font-bold mb-2">📝 Nomination Section</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Voter Dashboard -->
+                    <div class="bg-white p-2 rounded-2xl shadow-md">
+                        <h2 class="text-xl font-bold mb-3">Voter Dashboard</h2>
+                        <p class="text-sm text-gray-600 mb-3">Access the entire voter system and controls.</p>
+                        <a href="voter-dashboard.html"
+                            class="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg">Go to
+                            Voter</a>
                     </div>
 
-                </div>
-
-                <!-- Tab 2 -->
-                <div id="tab-2" class="tab-content hidden text-black">
-                    <!-- Admin Dashboard - Database Viewer Section -->
-                    <div class="bg-white p-6 rounded-2xl shadow-md col-span-3">
-                        <h2 class="text-xl font-bold mb-4">📁 Database Overview with Search & Export</h2>
-                        <div id="db-content" class="space-y-10">
-                            <p class="text-black">Loading data...</p>
-                        </div>
+                    <!-- Candidate Dashboard -->
+                    <div class="bg-white p-2 rounded-2xl shadow-md">
+                        <h2 class="text-xl font-bold mb-3">Candidate Dashboard</h2>
+                        <p class="text-sm text-gray-600 mb-3">Manage candidate data and controls.</p>
+                        <a href="candidate-dashboard.html"
+                            class="inline-block bg-green-500 text-white px-4 py-2 rounded-lg">Go
+                            to Candidate</a>
                     </div>
 
-                    <!-- Firebase Scripts -->
-                    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-                    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+                    <!-- Officer Dashboard -->
+                    <div class="bg-white p-2 rounded-2xl shadow-md">
+                        <h2 class="text-xl font-bold mb-3">Officer Dashboard</h2>
+                        <p class="text-sm text-gray-600 mb-3">Monitor officers and announcements.</p>
+                        <a href="officer-dashboard.html"
+                            class="inline-block bg-purple-500 text-white px-4 py-2 rounded-lg">Go
+                            to Officer</a>
+                    </div>
 
-                    <script type="module">
-                        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-                        import {
-                            getFirestore,
-                            collection,
-                            getDocs,
-                            deleteDoc,
-                            doc
-                        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+                    <!-- Database Viewer (optional future use) -->
+                    <div class="bg-white p-2 rounded-2xl shadow-md">
+                        <h2 class="text-xl font-bold mb-3">Database Viewer</h2>
+                        <p class="text-sm text-gray-600 mb-3">View all voter/candidate/officer records.</p>
+                        <button onclick="alert('Feature coming soon')"
+                            class="bg-yellow-500 text-white px-4 py-2 rounded-lg">Coming
+                            Soon</button>
+                    </div>
 
-                        const firebaseConfig = {
-                            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
-                            authDomain: "vote-edb06.firebaseapp.com",
-                            projectId: "vote-edb06",
-                            storageBucket: "vote-edb06.appspot.com",
-                            messagingSenderId: "916721565065",
-                            appId: "1:916721565065:web:2a451c1b45173d8b127558",
-                        };
-
-                        const app = initializeApp(firebaseConfig);
-                        const db = getFirestore(app);
-
-                        // 🔍 Filter function
-                        function filterList(inputId, containerClass) {
-                            const input = document.getElementById(inputId).value.toLowerCase();
-                            const cards = document.querySelectorAll(`.${containerClass} .user-card`);
-                            cards.forEach(card => {
-                                const text = card.innerText.toLowerCase();
-                                card.style.display = text.includes(input) ? 'block' : 'none';
-                            });
-                        }
-
-                        // 📤 CSV Export
-                        function exportCSV(data, type) {
-                            let csv = Object.keys(data[0]).join(',') + '\n';
-                            data.forEach(row => {
-                                csv += Object.values(row).join(',') + '\n';
-                            });
-                            const blob = new Blob([csv], { type: 'text/csv' });
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${type}_data.csv`;
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                        }
-
-                        // 🧱 Render each collection
-                        async function renderSection(collectionName, title, icon) {
-                            const snap = await getDocs(collection(db, collectionName));
-                            const containerId = `${collectionName}-container`;
-
-                            let html = `
-                      <div class="border rounded-xl p-4 shadow-sm ${collectionName}-section">
-                        <div class="flex justify-between items-center mb-3">
-                          <h3 class="text-lg font-semibold">${icon} ${title} (${snap.size})</h3>
-                          <div class="flex items-center gap-2">
-                            <input id="${collectionName}-search" type="text" oninput="filterList('${collectionName}-search', '${containerId}')" placeholder="Search..." class="border rounded px-3 py-1 text-sm" />
-                            <button onclick="exportCSV(window.${collectionName}Data, '${collectionName}')" class="text-sm px-3 py-1 bg-green-500 text-white rounded">Export CSV</button>
-                          </div>
-                        </div>
-                        <div id="${containerId}" class="${containerId} space-y-3 max-h-96 overflow-y-auto">`;
-
-                            const allData = [];
-
-                            if (!snap.empty) {
-                                snap.forEach(docSnap => {
-                                    const data = docSnap.data();
-                                    allData.push(data);
-
-                                    html += `
-                          <div class="user-card bg-gray-100 text-gray-800 p-3 rounded border relative">
-  ${Object.entries(data).map(([k, v]) => `<p class="text-sm"><span class="font-semibold">${k}:</span> ${v}</p>`).join('')}
-  <button onclick="deleteUser('${collectionName}', '${docSnap.id}')" class="absolute top-2 right-2 text-red-600 text-sm hover:underline">Delete</button>
-</div>
-`;
-                                });
-                            } else {
-                                html += `<p class="text-gray-500">No records found.</p>`;
-                            }
-
-                            html += `</div></div>`;
-                            window[`${collectionName}Data`] = allData;
-                            return html;
-                        }
-
-                        // 🗑️ Delete from Firestore
-                        window.deleteUser = async function (collectionName, docId) {
-                            const confirmDel = confirm("Are you sure you want to delete this entry?");
-                            if (!confirmDel) return;
-
-                            await deleteDoc(doc(db, collectionName, docId));
-                            alert("Record deleted!");
-                            renderDatabase(); // reload
-                        };
-
-                        // 🧩 Inject all
-                        window.filterList = filterList;
-                        window.exportCSV = exportCSV;
-
-                        async function renderDatabase() {
-                            const content = document.getElementById('db-content');
-                            content.innerHTML = "<p class='text-gray-500'>Loading data...</p>";
-                            const [votersHTML, candidatesHTML, officersHTML] = await Promise.all([
-                                renderSection("voters", "Voters", "🗳️"),
-                                renderSection("candidates", "Candidates", "🎯"),
-                                renderSection("officers", "Officers", "🎖️"),
-                            ]);
-                            content.innerHTML = votersHTML + candidatesHTML + officersHTML;
-                        }
-
-                        renderDatabase();
-                    </script>
-
-
+                    <!-- Site Stats (optional) -->
+                    <div class="bg-white p-2 rounded-2xl shadow-md">
+                        <h2 class="text-xl font-bold mb-3">Site Statistics</h2>
+                        <p class="text-sm text-gray-600 mb-3">Visual overview of system usage.</p>
+                        <button onclick="alert('Analytics not set up yet')"
+                            class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Coming
+                            Soon</button>
+                    </div>
                 </div>
-
 
             </div>
+
+            <!-- Tab 2 -->
+            <div id="tab-1" class="tab-content hidden text-white">
+                <h2 class="text-2xl font-bold mb-4">📝 Officer Verification</h2>
+
+                <!-- Global Message Section -->
+                <div id="messageBox" class="hidden mb-4 p-3 rounded-lg"></div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingOfficers" class="flex justify-center items-center py-6 hidden">
+                    <svg class="animate-spin h-10 w-10 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <p class="ml-3 text-lg">Loading Officers...</p>
+                </div>
+
+                <!-- Officers List -->
+                <div id="officerList" class="space-y-6 mt-4">
+                    <!-- Officers will be dynamically inserted here -->
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
 
         </div>
+
+
+    </div>
+
+
     </div>
 
 
@@ -558,6 +473,213 @@
 
 
     </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSPyZQDi1VmkvDWOXZngeVcgfnghLGj9Y",
+            authDomain: "ielect-pcs.firebaseapp.com",
+            projectId: "ielect-pcs",
+            storageBucket: "ielect-pcs.firebasestorage.app",
+            messagingSenderId: "487209895894",
+            appId: "1:487209895894:web:6d0bcc2e5b50ae226bc677"
+        };
+
+        // Init Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const officerList = document.getElementById("officerList");
+        const loading = document.getElementById("loadingOfficers");
+        const messageBox = document.getElementById("messageBox");
+
+        // ✅ Toast-like messages
+        function showMessage(text, type = "success") {
+            messageBox.textContent = text;
+            messageBox.className = `mb-4 p-3 rounded-lg text-center ${type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                }`;
+            messageBox.classList.remove("hidden");
+            setTimeout(() => messageBox.classList.add("hidden"), 4000);
+        }
+
+        // --- ✅ EMAILJS SENDER ---
+        async function sendApprovalEmail({ toEmail, toName, username, password, booth, role, loginLink }) {
+            const params = {
+                to_email: toEmail,
+                to_name: toName || "Election Officer",
+                username,
+                password,
+                booth,
+                role,
+                login_link: loginLink || "#",
+                subject: "Officer Approval – Your iElect Account Details"
+            };
+
+            try {
+                return await emailjs.send("service_fin9nv9", "template_e16bins", params); // ⚠️ Use your real service + template IDs
+            } catch (err) {
+                console.error("EmailJS error:", err);
+                throw new Error(err?.text || err?.message || "Unknown EmailJS error");
+            }
+        }
+
+        // ✅ Fetch officers
+        async function loadOfficers() {
+            loading.classList.remove("hidden");
+            officerList.innerHTML = "";
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "officers"));
+                loading.classList.add("hidden");
+
+                if (querySnapshot.empty) {
+                    officerList.innerHTML = `<p class="col-span-3 text-center text-gray-400">No officer requests found.</p>`;
+                    return;
+                }
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const officerId = docSnap.id;
+
+                    // Generate username & temp password
+                    const username = `${(data.firstName || "user").toLowerCase()}${String(data.officerId || "").slice(-4)}@ielect.com`;
+                    const password = `Pass${Math.floor(1000 + Math.random() * 9000)}`;
+
+                    // Officer Card
+                    const card = document.createElement("div");
+                    card.className = "w-full bg-gray-900 p-5 rounded-2xl shadow-xl border border-gray-700";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xl font-semibold">${data.firstName ?? ""} ${data.lastName ?? ""}</h3>
+                            <button class="expandBtn text-sm bg-blue-500 px-3 py-1 rounded">Expand</button>
+                        </div>
+                        <div class="details hidden">
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <p><strong>ID:</strong> ${data.officerId ?? ""}</p>
+                                <p><strong>Email:</strong> ${data.email ?? ""}</p>
+                                <p><strong>Phone:</strong> ${data.phone ?? ""}</p>
+                                <p><strong>Dept:</strong> ${data.department ?? ""}</p>
+                                <p><strong>Designation:</strong> ${data.designation ?? ""}</p>
+                                <p><strong>Service Year:</strong> ${data.serviceYear ?? ""}</p>
+                                <p><strong>DOB:</strong> ${data.dob ?? ""}</p>
+                                <p><strong>Gender:</strong> ${data.gender ?? ""}</p>
+                            </div>
+                            <hr class="my-3 border-gray-600">
+                            <p><strong>Auto Username:</strong> <span class="text-green-400">${username}</span></p>
+                            <p><strong>Temp Password:</strong> <span class="text-yellow-400">${password}</span></p>
+                            <div class="mt-3">
+                                <label class="block text-sm mb-1">Assign Booth:</label>
+                                <input type="text" class="boothInput w-full text-black px-2 py-1 rounded" placeholder="Enter Booth">
+                            </div>
+                            <div class="mt-3">
+                                <label class="block text-sm mb-1">Assign Role:</label>
+                                <input type="text" class="roleInput w-full text-black px-2 py-1 rounded" placeholder="Enter Role">
+                            </div>
+                            <div class="flex gap-2 mt-4">
+                                <button class="approveBtn bg-green-600 px-3 py-1 rounded">Approve</button>
+                                <button class="cancelBtn bg-red-600 px-3 py-1 rounded">Cancel</button>
+                                <button class="closeBtn bg-gray-600 px-3 py-1 rounded">Close</button>
+                            </div>
+                        </div>
+                    `;
+
+                    // Expand/close
+                    card.querySelector(".expandBtn").addEventListener("click", () => {
+                        card.querySelector(".details").classList.toggle("hidden");
+                    });
+                    card.querySelector(".closeBtn").addEventListener("click", () => {
+                        card.querySelector(".details").classList.add("hidden");
+                    });
+
+                    // Cancel
+                    card.querySelector(".cancelBtn").addEventListener("click", async () => {
+                        if (confirm("Cancel this officer request?")) {
+                            await updateDoc(doc(db, "officers", officerId), { status: "Cancelled" });
+                            showMessage("Request cancelled", "success");
+                            loadOfficers();
+                        }
+                    });
+
+                    // Approve
+                    card.querySelector(".approveBtn").addEventListener("click", async (e) => {
+                        const approveBtn = e.target;
+                        approveBtn.disabled = true;
+                        approveBtn.textContent = "Processing...";
+
+                        const booth = card.querySelector(".boothInput").value.trim();
+                        const role = card.querySelector(".roleInput").value.trim();
+
+                        if (!booth || !role) {
+                            showMessage("Please assign booth and role", "error");
+                            approveBtn.disabled = false;
+                            approveBtn.textContent = "Approve";
+                            return;
+                        }
+
+                        try {
+                            // ✅ Update Firestore
+                            await updateDoc(doc(db, "officers", officerId), {
+                                username,
+                                password,
+                                booth,
+                                boothRole: role,
+                                status: "Approved",
+                                approvedAt: new Date().toISOString()
+                            });
+
+                            // ✅ Send Email
+                            showMessage("Sending approval email...", "success");
+                            await sendApprovalEmail({
+                                toEmail: data.email, // officer’s email from Firestore
+                                toName: `${data.firstName ?? "Election"} ${data.lastName ?? "Officer"}`.trim(),
+                                username,
+                                password,
+                                booth,
+                                role,
+                                loginLink: "#" // 🔗 Replace with actual login link
+                            });
+
+                            showMessage(`✅ Officer Approved & Email Sent to ${data.email}`, "success");
+                            loadOfficers();
+                        } catch (err) {
+                            console.error("Approval error:", err);
+                            const msg = err?.text || err?.message || JSON.stringify(err);
+                            showMessage("Error approving officer: " + msg, "error");
+                        } finally {
+                            approveBtn.disabled = false;
+                            approveBtn.textContent = "Approve";
+                        }
+                    });
+
+                    officerList.appendChild(card);
+                });
+            } catch (err) {
+                loading.classList.add("hidden");
+                officerList.innerHTML = `<p class="text-red-500 text-center">Error loading officers: ${err.message}</p>`;
+                console.error(err);
+            }
+        }
+
+        // Run on load
+        loadOfficers();
+    </script>
+
+    <!-- ✅ Latest EmailJS v4 SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        (function () {
+            emailjs.init({ publicKey: "988EMtU0SHZzFIXrH" }); // ✅ Your EmailJS Public Key
+        })();
+    </script>
+
+
+
+
+
+
+
+
 
 
     <!-- Scrollbar -->
@@ -571,6 +693,7 @@
             border-radius: 3px;
         }
     </style>
+
 
     <script src="auth-guard.js"></script>
 
