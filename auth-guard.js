@@ -5,19 +5,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentPage = window.location.pathname;
     const expectedRole = currentPage.match(/\/([a-z]+)-dashboard\.html/i)?.[1];
 
-    const basePath = "/vote"; // ✅ repo name for GitHub Pages
+    const dashboard = document.getElementById("dashboardContent");
 
     if (!userId || !userRole || userRole !== expectedRole) {
         alert("Access Denied. Please log in first.");
 
+        // Redirect based on role
         if (expectedRole === "admin") {
-            window.location.href = `${basePath}/admin.html`; // ✅ admin redirect
+            window.location.href = "/admin.html";
         } else {
-            window.location.href = `${basePath}/index.html`; // ✅ all others
+            window.location.href = "/index.html";
         }
     } else {
-        // Optional: prevent flash of dashboard content on unauthorized access
-        const content = document.getElementById("dashboardContent");
-        if (content) content.style.display = "block";
+        // ✅ Authorized → Show dashboard content
+        if (dashboard) {
+            dashboard.style.display = "block";
+        }
+        document.body.classList.remove("logged-out");
     }
 });
