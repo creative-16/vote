@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Official Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #dashboardContent {
+            display: none;
+            /* hidden by default */
+        }
+
+        body.logged-out main {
+            display: none;
+        }
+    </style>
 
     <!-- firebase-init.js -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -28,126 +38,124 @@
 
 <body
     class="bg-gradient-to-br from-pink-100 via-pink-200 to-pink-300 min-h-screen flex items-center justify-center p-4">
-    <div id="dashboardContent" style="display: none;">
 
-        <!-- Main Container -->
+
+    <!-- Main Container -->
+    <div
+        class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
+
+        <!-- Sidebar -->
         <div
-            class="w-full max-w-screen-xl bg-white/30 backdrop-blur-md rounded-3xl flex flex-col md:flex-row shadow-2xl h-auto md:h-[90vh] border border-white/40">
+            class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
+            <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
+            <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
+            <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">✏️</button>
+            <button onclick="openTab(3)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
 
-            <!-- Sidebar -->
-            <div
-                class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
-                <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
-                <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
-                <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">✏️</button>
-                <button onclick="openTab(3)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
+        </div>
 
-            </div>
+        <!-- Content -->
+        <div
+            class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
 
-            <!-- Content -->
-            <div
-                class="flex-1 bg-gradient-to-br from-teal-600 to-teal-800 p-4 md:p-6 rounded-b-3xl md:rounded-r-3xl md:rounded-bl-none overflow-y-auto">
+            <!-- Tab 0 -->
+            <div id="tab-0" class="tab-content h-full flex flex-col">
+                <h2 class="text-white text-2xl font-bold mb-4">Officer Dashboard</h2>
 
-                <!-- Tab 0 -->
-                <div id="tab-0" class="tab-content h-full flex flex-col">
-                    <h2 class="text-white text-2xl font-bold mb-4">Officer Dashboard</h2>
+                <!-- Row Layout -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow items-start">
 
-                    <!-- Row Layout -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow items-start">
-
-                        <!-- Clock -->
-                        <div class="bg-white/90 rounded-2xl p-6 shadow-md hover:shadow-xl transition">
-                            <div id="clock" class="text-center text-gray-800">
-                                <div class="text-xl font-semibold">📅 <span id="date"></span></div>
-                                <div class="text-3xl font-bold mt-1 tracking-wide" id="time"></div>
-                                <div class="text-lg mt-1 text-gray-600" id="day"></div>
-                            </div>
+                    <!-- Clock -->
+                    <div class="bg-white/90 rounded-2xl p-6 shadow-md hover:shadow-xl transition">
+                        <div id="clock" class="text-center text-gray-800">
+                            <div class="text-xl font-semibold">📅 <span id="date"></span></div>
+                            <div class="text-3xl font-bold mt-1 tracking-wide" id="time"></div>
+                            <div class="text-lg mt-1 text-gray-600" id="day"></div>
                         </div>
+                    </div>
 
 
 
-                        <!-- Calendar -->
-                        <div class="bg-white/70 rounded-2xl p-4 shadow-md flex flex-col h-auto relative">
-                            <div id="calendarContainer" class="text-black-800 w-full relative h-auto">
-                                <div id="calendarView" class="flex flex-col">
-                                    <!-- Header -->
-                                    <div class="flex justify-between items-center mb-3">
-                                        <button onclick="changeMonth(-1)"
-                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
-                                        <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
-                                        <button onclick="changeMonth(1)"
-                                            class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
-                                    </div>
-
-                                    <!-- Week Days -->
-                                    <div
-                                        class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
-                                        <div>Sun</div>
-                                        <div>Mon</div>
-                                        <div>Tue</div>
-                                        <div>Wed</div>
-                                        <div>Thu</div>
-                                        <div>Fri</div>
-                                        <div>Sat</div>
-                                    </div>
-
-                                    <!-- Days -->
-                                    <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
-                                    </div>
+                    <!-- Calendar -->
+                    <div class="bg-white/70 rounded-2xl p-4 shadow-md flex flex-col h-auto relative">
+                        <div id="calendarContainer" class="text-black-800 w-full relative h-auto">
+                            <div id="calendarView" class="flex flex-col">
+                                <!-- Header -->
+                                <div class="flex justify-between items-center mb-3">
+                                    <button onclick="changeMonth(-1)"
+                                        class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">‹</button>
+                                    <h2 id="monthYear" class="text-lg font-bold text-black"></h2>
+                                    <button onclick="changeMonth(1)"
+                                        class="text-black bg-white hover:bg-orange-400 px-2 py-1 rounded-full text-sm">›</button>
                                 </div>
 
-                                <!-- Event Detail -->
-                                <div id="eventView"
-                                    class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
-                                    <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
-                                            id="selectedDate"></span></h3>
-                                    <p id="eventText" class="text-gray-700 text-center mb-4"></p>
-                                    <button onclick="closeEvent()"
-                                        class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
-                                        Back to Calendar</button>
+                                <!-- Week Days -->
+                                <div class="grid grid-cols-7 gap-1 text-center font-medium text-gray-700 text-xs mb-1">
+                                    <div>Sun</div>
+                                    <div>Mon</div>
+                                    <div>Tue</div>
+                                    <div>Wed</div>
+                                    <div>Thu</div>
+                                    <div>Fri</div>
+                                    <div>Sat</div>
                                 </div>
+
+                                <!-- Days -->
+                                <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm pb-2">
+                                </div>
+                            </div>
+
+                            <!-- Event Detail -->
+                            <div id="eventView"
+                                class="absolute inset-0 bg-white/100 rounded-xl p-6 shadow-xl hidden flex-col justify-center items-center z-10">
+                                <h3 class="text-xl font-semibold text-teal-800 mb-2">📌 Event on <span
+                                        id="selectedDate"></span></h3>
+                                <p id="eventText" class="text-gray-700 text-center mb-4"></p>
+                                <button onclick="closeEvent()"
+                                    class="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg shadow-md">⬅
+                                    Back to Calendar</button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tab 1 -->
-                <div id="tab-1" class="tab-content hidden text-white">
-                    <h2 class="text-2xl font-bold mb-2">📝 Voting Section</h2>
-                    <!-- Nomination Review Section -->
-                    <div class="mt-10">
-                        <h2 class="text-2xl font-bold mb-4">Nomination Verification</h2>
-                        <div id="nominationList" class="space-y-4">
-                            <!-- Cards will be injected here -->
-                        </div>
+            <!-- Tab 1 -->
+            <div id="tab-1" class="tab-content hidden text-white">
+                <h2 class="text-2xl font-bold mb-2">📝 Nomination Verification</h2>
+                <!-- Nomination Review Section -->
+                <div class="mt-10">
+                    <div id="nominationList" class="space-y-4">
+                        <!-- Cards will be injected here -->
                     </div>
+                </div>
 
 
-                    <script>
-                        let db;
-                        if (!firebase.apps.length) {
-                            firebase.initializeApp(firebaseConfig);
-                        }
-                        db = firebase.firestore();
+                <script>
+                    let db;
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    db = firebase.firestore();
 
-                        async function loadNominations() {
-                            const nominationsSnapshot = await db.collection("nominations").get();
-                            const listContainer = document.getElementById("nominationList");
-                            listContainer.innerHTML = "";
+                    async function loadNominations() {
+                        const nominationsSnapshot = await db.collection("nominations").get();
+                        const listContainer = document.getElementById("nominationList");
+                        listContainer.innerHTML = "";
 
-                            nominationsSnapshot.forEach((docSnap) => {
-                                const data = docSnap.data();
-                                const statusColor =
-                                    data.status === "approved"
-                                        ? "bg-green-100 text-green-800"
-                                        : data.status === "rejected"
-                                            ? "bg-red-100 text-red-800"
-                                            : "bg-yellow-100 text-yellow-800";
+                        nominationsSnapshot.forEach((docSnap) => {
+                            const data = docSnap.data();
+                            const statusColor =
+                                data.status === "approved"
+                                    ? "bg-green-100 text-green-800"
+                                    : data.status === "rejected"
+                                        ? "bg-red-100 text-red-800"
+                                        : "bg-yellow-100 text-yellow-800";
 
-                                const card = document.createElement("div");
-                                card.className = "bg-white rounded-xl shadow-md p-4 border flex flex-col gap-2";
+                            const card = document.createElement("div");
+                            card.className = "bg-white rounded-xl shadow-md p-4 border flex flex-col gap-2";
 
-                                card.innerHTML = `
+                            card.innerHTML = `
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <h3 class="text-xl font-semibold text-black">${data.fullName || "undefined"}</h3>
@@ -165,211 +173,211 @@
                                         class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700">Reject</button>
                                 </div>
                             `;
-                                listContainer.appendChild(card);
-                            });
-                        }
+                            listContainer.appendChild(card);
+                        });
+                    }
 
-                        window.markReview = async function (id) {
-                            const nominationRef = db.collection("nominations").doc(id);
-                            await nominationRef.update({ status: "pending" });
-                            loadNominations();
-                        };
-
-                        window.updateStatus = async function (id, newStatus) {
-                            try {
-                                const nominationRef = db.collection("nominations").doc(id);
-                                await nominationRef.update({ status: newStatus });
-
-                                if (newStatus === "approved") {
-                                    const nominationSnap = await nominationRef.get();
-                                    const data = nominationSnap.data();
-
-                                    const candidatesSnapshot = await db.collection("candidates").get();
-                                    let matchedCandidateDocId = null;
-
-                                    candidatesSnapshot.forEach((docSnap) => {
-                                        const candidateData = docSnap.data();
-                                        if (candidateData.id === data.id) {
-                                            matchedCandidateDocId = docSnap.id;
-                                        }
-                                    });
-
-                                    if (matchedCandidateDocId) {
-                                        const candidateRef = db.collection("candidates").doc(matchedCandidateDocId);
-                                        await candidateRef.update({
-                                            fullName: data.fullName || "",
-                                            dob: data.dob || "",
-                                            department: data.department || "",
-                                            partyName: data.partyName || "",
-                                            post: data.post || "",
-                                            qualification: data.qualification || "",
-                                            statement: data.statement || "",
-                                            symbolName: data.symbolName || "",
-                                            status: "approved",
-                                        });
-                                        console.log(`✅ Candidate updated: ${matchedCandidateDocId}`);
-                                    } else {
-                                        console.warn("⚠️ No candidate matched with nomination ID:", data.id);
-                                    }
-                                }
-
-                                await loadNominations();
-                            } catch (err) {
-                                console.error("❌ Error updating nomination:", err);
-                            }
-                        };
-
-                        // Load initially
+                    window.markReview = async function (id) {
+                        const nominationRef = db.collection("nominations").doc(id);
+                        await nominationRef.update({ status: "pending" });
                         loadNominations();
-                    </script>
+                    };
+
+                    window.updateStatus = async function (id, newStatus) {
+                        try {
+                            const nominationRef = db.collection("nominations").doc(id);
+                            await nominationRef.update({ status: newStatus });
+
+                            if (newStatus === "approved") {
+                                const nominationSnap = await nominationRef.get();
+                                const data = nominationSnap.data();
+
+                                const candidatesSnapshot = await db.collection("candidates").get();
+                                let matchedCandidateDocId = null;
+
+                                candidatesSnapshot.forEach((docSnap) => {
+                                    const candidateData = docSnap.data();
+                                    if (candidateData.id === data.id) {
+                                        matchedCandidateDocId = docSnap.id;
+                                    }
+                                });
+
+                                if (matchedCandidateDocId) {
+                                    const candidateRef = db.collection("candidates").doc(matchedCandidateDocId);
+                                    await candidateRef.update({
+                                        fullName: data.fullName || "",
+                                        dob: data.dob || "",
+                                        department: data.department || "",
+                                        partyName: data.partyName || "",
+                                        post: data.post || "",
+                                        qualification: data.qualification || "",
+                                        statement: data.statement || "",
+                                        symbolName: data.symbolName || "",
+                                        status: "approved",
+                                    });
+                                    console.log(`✅ Candidate updated: ${matchedCandidateDocId}`);
+                                } else {
+                                    console.warn("⚠️ No candidate matched with nomination ID:", data.id);
+                                }
+                            }
+
+                            await loadNominations();
+                        } catch (err) {
+                            console.error("❌ Error updating nomination:", err);
+                        }
+                    };
+
+                    // Load initially
+                    loadNominations();
+                </script>
 
 
 
 
-                </div>
+            </div>
 
-                <!-- Tab 2 -->
-                <div id="tab-2" class="tab-content hidden text-white">
-                    <!-- Event Section -->
-                    <div class="p-4 bg-white shadow-xl rounded-2xl w-full max-w-3x1 mx-auto mt-10">
-                        <h3 class="text-xl font-semibold text-black text-center mb-4">📅 Calendar Events</h3>
+            <!-- Tab 2 -->
+            <div id="tab-2" class="tab-content hidden text-white">
+                <!-- Event Section -->
+                <div class="p-4 bg-white shadow-xl rounded-2xl w-full max-w-3x1 mx-auto mt-10">
+                    <h3 class="text-xl font-semibold text-black text-center mb-4">📅 Calendar Events</h3>
 
-                        <div class="p-3 max-h-[60vh] overflow-y-auto custom-scrollbar" id="eventTabContainer">
-                            <!-- Add Event Button -->
-                            <div class="text-center mb-4">
-                                <button onclick="toggleEventForm(true)"
-                                    class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
-                                    id="addEventBtn">
-                                    Add Event to Calendar
-                                </button>
-                            </div>
+                    <div class="p-3 max-h-[60vh] overflow-y-auto custom-scrollbar" id="eventTabContainer">
+                        <!-- Add Event Button -->
+                        <div class="text-center mb-4">
+                            <button onclick="toggleEventForm(true)"
+                                class="bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+                                id="addEventBtn">
+                                Add Event to Calendar
+                            </button>
+                        </div>
 
-                            <!-- Event Form -->
-                            <div id="eventFormSection" class="hidden transition-all duration-300 ease-in-out mt-6">
-                                <div class="bg-white shadow-xl rounded-2xl p-4 max-w-3xl mx-auto text-black">
-                                    <form id="eventForm" class="space-y-4">
-                                        <div>
-                                            <label class="block text-sm font-semibold text-gray-700 mb-1">📌 Event Title
-                                                *</label>
-                                            <input type="text" id="eventTitle" required
-                                                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:border-blue-500" />
-                                        </div>
+                        <!-- Event Form -->
+                        <div id="eventFormSection" class="hidden transition-all duration-300 ease-in-out mt-6">
+                            <div class="bg-white shadow-xl rounded-2xl p-4 max-w-3xl mx-auto text-black">
+                                <form id="eventForm" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">📌 Event Title
+                                            *</label>
+                                        <input type="text" id="eventTitle" required
+                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:border-blue-500" />
+                                    </div>
 
-                                        <div>
-                                            <label class="block text-sm font-semibold text-gray-700 mb-1">📅 Event Date
-                                                *</label>
-                                            <input type="date" id="eventDate" required
-                                                class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:border-blue-500" />
-                                        </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">📅 Event Date
+                                            *</label>
+                                        <input type="date" id="eventDate" required
+                                            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring focus:border-blue-500" />
+                                    </div>
 
-                                        <div class="flex justify-end space-x-3">
-                                            <button type="button" onclick="toggleEventForm(false)"
-                                                class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-medium">Cancel</button>
-                                            <button type="submit"
-                                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">Add
-                                                Event</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                    <div class="flex justify-end space-x-3">
+                                        <button type="button" onclick="toggleEventForm(false)"
+                                            class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-medium">Cancel</button>
+                                        <button type="submit"
+                                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">Add
+                                            Event</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Announcement Section -->
-                    <div class="p-3 bg-white shadow-xl rounded-2xl w-full max-w-3x1 mx-auto mt-10">
-                        <h3 class="text-xl font-semibold text-black text-center mb-4">📢 Announcements</h3>
+                <!-- Announcement Section -->
+                <div class="p-3 bg-white shadow-xl rounded-2xl w-full max-w-3x1 mx-auto mt-10">
+                    <h3 class="text-xl font-semibold text-black text-center mb-4">📢 Announcements</h3>
 
-                        <div class="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar" id="announcementTabContainer">
-                            <!-- Add Announcement Button -->
-                            <div class="text-center mb-4">
-                                <button onclick="toggleAnnouncementForm(true)"
-                                    class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
-                                    id="addAnnouncementBtn">
-                                    Post Announcement
-                                </button>
-                            </div>
+                    <div class="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar" id="announcementTabContainer">
+                        <!-- Add Announcement Button -->
+                        <div class="text-center mb-4">
+                            <button onclick="toggleAnnouncementForm(true)"
+                                class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+                                id="addAnnouncementBtn">
+                                Post Announcement
+                            </button>
+                        </div>
 
-                            <!-- Announcement Form -->
-                            <div id="announcementFormSection" class="hidden transition-all duration-300 ease-in-out">
-                                <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto text-black">
-                                    <form class="space-y-4" id="announcementForm">
-                                        <div>
-                                            <label class="block font-semibold mb-1">Category</label>
-                                            <select required
-                                                class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300">
-                                                <option value="">Select Category</option>
-                                                <option value="General">General</option>
-                                                <option value="Urgent">Urgent</option>
-                                                <option value="Reminder">Reminder</option>
-                                                <option value="Election">Election</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block font-semibold mb-1">Announcement</label>
-                                            <textarea rows="4"
-                                                class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300"
-                                                placeholder="Write your announcement here..." required></textarea>
-                                        </div>
-                                        <div class="flex justify-center gap-4 pt-2">
-                                            <button type="submit"
-                                                class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200">
-                                                Submit
-                                            </button>
-                                            <button type="button" onclick="toggleAnnouncementForm(false)"
-                                                class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
+                        <!-- Announcement Form -->
+                        <div id="announcementFormSection" class="hidden transition-all duration-300 ease-in-out">
+                            <div class="bg-white shadow-xl rounded-2xl p-6 max-w-3xl mx-auto text-black">
+                                <form class="space-y-4" id="announcementForm">
+                                    <div>
+                                        <label class="block font-semibold mb-1">Category</label>
+                                        <select required
+                                            class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300">
+                                            <option value="">Select Category</option>
+                                            <option value="General">General</option>
+                                            <option value="Urgent">Urgent</option>
+                                            <option value="Reminder">Reminder</option>
+                                            <option value="Election">Election</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold mb-1">Announcement</label>
+                                        <textarea rows="4"
+                                            class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                            placeholder="Write your announcement here..." required></textarea>
+                                    </div>
+                                    <div class="flex justify-center gap-4 pt-2">
+                                        <button type="submit"
+                                            class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200">
+                                            Submit
+                                        </button>
+                                        <button type="button" onclick="toggleAnnouncementForm(false)"
+                                            class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Form Logic Script (already present in your code, reuse) -->
-                    <script>
-                        function toggleEventForm(show) {
-                            const formSection = document.getElementById("eventFormSection");
-                            const addBtn = document.getElementById("addEventBtn");
-
-                            if (show) {
-                                formSection.classList.remove("hidden");
-                                addBtn.classList.add("hidden");
-                            } else {
-                                formSection.classList.add("hidden");
-                                addBtn.classList.remove("hidden");
-                                document.getElementById("eventForm").reset();
-                            }
-                        }
-
-
-
-                        function toggleAnnouncementForm(show) {
-                            const formSection = document.getElementById("announcementFormSection");
-                            const addBtn = document.getElementById("addAnnouncementBtn");
-
-                            if (show) {
-                                formSection.classList.remove("hidden");
-                                addBtn.classList.add("hidden");
-                            } else {
-                                formSection.classList.add("hidden");
-                                addBtn.classList.remove("hidden");
-                                document.getElementById("announcementForm").reset();
-                            }
-                        }
-
-                    </script>
                 </div>
 
+                <!-- Form Logic Script (already present in your code, reuse) -->
+                <script>
+                    function toggleEventForm(show) {
+                        const formSection = document.getElementById("eventFormSection");
+                        const addBtn = document.getElementById("addEventBtn");
 
-                <!-- Tab 3 -->
-                <div id="tab-3" class="tab-content hidden text-white">
-                    <h2 class="text-2xl font-bold mb-2">👤 Profile Details</h2>
-                    <p>This section will show the user's profile information.</p>
-                </div>
+                        if (show) {
+                            formSection.classList.remove("hidden");
+                            addBtn.classList.add("hidden");
+                        } else {
+                            formSection.classList.add("hidden");
+                            addBtn.classList.remove("hidden");
+                            document.getElementById("eventForm").reset();
+                        }
+                    }
+
+
+
+                    function toggleAnnouncementForm(show) {
+                        const formSection = document.getElementById("announcementFormSection");
+                        const addBtn = document.getElementById("addAnnouncementBtn");
+
+                        if (show) {
+                            formSection.classList.remove("hidden");
+                            addBtn.classList.add("hidden");
+                        } else {
+                            formSection.classList.add("hidden");
+                            addBtn.classList.remove("hidden");
+                            document.getElementById("announcementForm").reset();
+                        }
+                    }
+
+                </script>
+            </div>
+
+
+            <!-- Tab 3 -->
+            <div id="tab-3" class="tab-content hidden text-white">
+                <h2 class="text-2xl font-bold mb-2">👤 Profile Details</h2>
+                <p>This section will show the user's profile information.</p>
             </div>
         </div>
     </div>
+
     <!-- Tab JS -->
     <script>
         function openTab(index) {
