@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>iElect • Officer Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    borderRadius: { '2xl': '1.25rem' },
+                    colors: { brand: { DEFAULT: '#4f46e5' } }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-pink-100 flex items-center justify-center p-6">
+    <div class="w-full max-w-4xl">
+        <div
+            class="rounded-2xl bg-white/70 backdrop-blur-xl shadow-2xl p-8 border border-white/40 hover:shadow-indigo-200 transition">
+            <h1 class="text-3xl font-bold text-indigo-700 text-center mb-2">Officer Application</h1>
+            <p class="text-slate-600 text-center mb-8">Fill in your details. Admin will review and email your
+                credentials.</p>
+
+            <form id="form" class="grid md:grid-cols-2 gap-6">
+                <!-- First Name -->
+                <input id="firstName" name="firstName"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="First Name" required>
+
+                <!-- Last Name -->
+                <input id="lastName" name="lastName"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Last Name" required>
+
+                <!-- Officer ID -->
+                <input id="officerId" name="officerId"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Officer ID" required>
+
+                <!-- Email -->
+                <input id="email" name="email" type="email"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Email ID" required>
+
+                <!-- Phone -->
+                <input id="phone" name="phone" type="tel"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Phone Number" required>
+
+                <!-- DOB -->
+                <input id="dob" name="dob" type="date"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Date of Birth" required>
+
+                <!-- Department -->
+                <input id="department" name="department"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Department" required>
+
+                <!-- Designation -->
+                <input id="designation" name="designation"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Designation (e.g., Returning Officer)" required>
+
+                <!-- Gender -->
+                <select id="gender" name="gender"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+
+                <!-- Service Start Year -->
+                <input id="serviceYear" name="serviceYear" type="number" min="1960" max="2025"
+                    class="px-4 py-3 rounded-xl bg-white/80 border border-slate-200 focus:ring-2 focus:ring-indigo-400 outline-none"
+                    placeholder="Year Started Service" required>
+
+                <!-- Submit Button -->
+                <button id="submitBtn"
+                    class="md:col-span-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-lg shadow-lg transition">
+                    Submit Application
+                </button>
+            </form>
+
+
+            <!-- Status message -->
+            <div id="status" class="mt-6 flex justify-center"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // ✅ Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSPyZQDi1VmkvDWOXZngeVcgfnghLGj9Y",
+            authDomain: "ielect-pcs.firebaseapp.com",
+            projectId: "ielect-pcs",
+            storageBucket: "ielect-pcs.firebasestorage.app",
+            messagingSenderId: "487209895894",
+            appId: "1:487209895894:web:6d0bcc2e5b50ae226bc677"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ⚠️ Make sure your form has id="form"
+        const form = document.getElementById("form");
+        const status = document.getElementById("status");
+        const submitBtn = document.getElementById("submitBtn");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            // Show loading spinner
+            status.innerHTML = `
+            <div class="flex items-center gap-2 text-indigo-600">
+              <svg class="animate-spin h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              Processing...
+            </div>
+          `;
+
+            submitBtn.disabled = true;
+
+            // Collect values
+            const officerId = document.getElementById("officerId").value.trim();
+
+            const payload = {
+                firstName: document.getElementById("firstName").value.trim(),
+                lastName: document.getElementById("lastName").value.trim(),
+                officerId: officerId,
+                email: document.getElementById("email").value.trim(),
+                phone: document.getElementById("phone").value.trim(),
+                dob: document.getElementById("dob").value,
+                department: document.getElementById("department").value.trim(),
+                designation: document.getElementById("designation").value.trim(),
+                gender: document.getElementById("gender").value,
+                serviceYear: document.getElementById("serviceYear").value.trim(),
+                submittedAt: new Date().toISOString()
+            };
+
+            try {
+                // 🔍 Check if officerId already exists
+                const q = query(collection(db, "officers"), where("officerId", "==", officerId));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    status.innerHTML = `
+                    <div class="flex items-center gap-3 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-xl shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span>Officer ID already registered. Please use a unique Officer ID.</span>
+                    </div>
+                    `;
+                } else {
+                    // 📝 Add new officer entry
+                    await addDoc(collection(db, "officers"), payload);
+
+                    status.innerHTML = `
+                    <div class="flex items-center gap-3 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-xl shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Application submitted successfully! You'll receive credentials after approval.</span>
+                    </div>
+                    `;
+                    form.reset();
+                }
+            } catch (err) {
+                status.innerHTML = `
+                <div class="flex items-center gap-3 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-xl shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span>Error: ${err.message || "Submission failed"}</span>
+                </div>
+                `;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
