@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Verification System</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+    <!-- QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #ff7e00;
+            --secondary-color: #ff9500;
+            --success-color: #0f9d58;
+            --error-color: #ea4335;
+            --warning-color: #fbbc04;
+            --text-color: #202124;
+            --light-text: #5f6368;
+            --background-color: #f5f5f5;
+            --card-background: #ffffff;
+            --border-color: #dadce0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --sidebar-width: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-container {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        header {
+            background-color: var(--card-background);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .date-time {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .date {
+            font-weight: 500;
+        }
+
+        .time {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .officer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--background-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .content-area {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .scanner-container {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .scanner-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background-color: var(--background-color);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(15, 157, 88, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(15, 157, 88, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(15, 157, 88, 0);
+            }
+        }
+
+        #qr-reader {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .scanner-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e8eaed;
+        }
+
+        .result-container {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .success-icon {
+            background-color: rgba(15, 157, 88, 0.1);
+            color: var(--success-color);
+        }
+
+        .error-icon {
+            background-color: rgba(234, 67, 53, 0.1);
+            color: var(--error-color);
+        }
+
+        .warning-icon {
+            background-color: rgba(251, 188, 4, 0.1);
+            color: var(--warning-color);
+        }
+
+        .result-message {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .manual-input-container {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .manual-input-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--light-text);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-control {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 126, 0, 0.1);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .notification-error {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        .notification-warning {
+            background-color: var(--warning-color);
+            color: var(--text-color);
+        }
+
+        /* Overlay for mobile sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-container {
+                margin-left: 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .header-info {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-end;
+            }
+
+            .officer-info {
+                font-size: 0.9rem;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .scanner-container {
+                padding: 1.5rem;
+            }
+
+            .scanner-controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .result-message {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.2rem;
+            }
+
+            .scanner-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .status-indicator {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .scanner-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .form-control {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Overlay for mobile sidebar -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-vote-yea"></i> Vote System</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Verify Voter</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Voters</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <header>
+            <div class="header-left">
+                <button class="hamburger" id="hamburger">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">Voter Verification System</div>
+            </div>
+            <div class="header-info">
+                <div class="date-time">
+                    <div class="date" id="current-date">October 3, 2025</div>
+                    <div class="time" id="current-time">03:07:42 PM</div>
+                </div>
+                <div class="officer-info">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Officer: John Doe</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="content-area">
+                <section class="scanner-container">
+                    <div class="scanner-header">
+                        <h2>QR Code Scanner</h2>
+                        <div class="status-indicator">
+                            <div class="status-dot"></div>
+                            <span>Ready to scan</span>
+                        </div>
+                    </div>
+
+                    <div id="qr-reader"></div>
+
+                    <div class="scanner-controls">
+                        <button id="start-scan-btn" class="btn btn-primary">
+                            <i class="fas fa-qrcode"></i> Start Scanning
+                        </button>
+                        <button id="stop-scan-btn" class="btn btn-secondary" disabled>
+                            <i class="fas fa-stop"></i> Stop Scanning
+                        </button>
+                    </div>
+
+                    <div class="manual-input-container">
+                        <div class="manual-input-header">
+                            <i class="fas fa-keyboard"></i>
+                            <span>Or enter voter ID manually</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="manual-voter-id" class="form-control" placeholder="Enter Voter ID">
+                            <button id="manual-check-btn" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Check Status
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="result-container" class="result-container">
+                    <div id="result-icon" class="result-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div id="result-message" class="result-message">
+                        <!-- Result message will be inserted here -->
+                    </div>
+                    <div class="action-buttons">
+                        <button id="new-scan-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> New Scan
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="notification" class="notification">
+        <i id="notification-icon" class="fas fa-check-circle"></i>
+        <span id="notification-message">Notification message</span>
+    </div>
+
+    <script>
+        // Initialize Firebase - Replace with your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
+            authDomain: "vote-edb06.firebaseapp.com",
+            projectId: "vote-edb06",
+            storageBucket: "vote-edb06.appspot.com",
+            messagingSenderId: "916721565065",
+            appId: "1:916721565065:web:2a451c1b45173d8b127558",
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const qrReader = document.getElementById('qr-reader');
+        const startScanBtn = document.getElementById('start-scan-btn');
+        const stopScanBtn = document.getElementById('stop-scan-btn');
+        const resultContainer = document.getElementById('result-container');
+        const manualVoterId = document.getElementById('manual-voter-id');
+        const manualCheckBtn = document.getElementById('manual-check-btn');
+        const newScanBtn = document.getElementById('new-scan-btn');
+        const notification = document.getElementById('notification');
+        const notificationIcon = document.getElementById('notification-icon');
+        const notificationMessage = document.getElementById('notification-message');
+        const resultIcon = document.getElementById('result-icon');
+        const resultMessage = document.getElementById('result-message');
+
+        // Mobile menu elements
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        // QR Code Scanner
+        let html5QrCode = null;
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const date = now.toLocaleDateString('en-US', options);
+            const time = now.toLocaleTimeString('en-US', { hour12: true });
+
+            document.getElementById('current-date').textContent = date;
+            document.getElementById('current-time').textContent = time;
+        }
+
+        // Initialize date and time
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Initialize QR Scanner
+        function initializeScanner() {
+            html5QrCode = new Html5Qrcode("qr-reader");
+        }
+
+        // Start QR Scanner
+        function startScanner() {
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                (decodedText, decodedResult) => {
+                    // QR Code scanned successfully
+                    html5QrCode.stop().then(() => {
+                        startScanBtn.disabled = false;
+                        stopScanBtn.disabled = true;
+                        checkVoterStatus(decodedText);
+                    }).catch((err) => {
+                        console.error(`Unable to stop scanning: ${err}`);
+                    });
+                },
+                (errorMessage) => {
+                    // Handle scan error silently
+                }
+            ).then(() => {
+                startScanBtn.disabled = true;
+                stopScanBtn.disabled = false;
+                showNotification("Scanner started successfully", "success");
+            }).catch((err) => {
+                console.error(`Unable to start scanning: ${err}`);
+                showNotification("Failed to start camera. Please check permissions.", "error");
+            });
+        }
+
+        // Stop QR Scanner
+        function stopScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    startScanBtn.disabled = false;
+                    stopScanBtn.disabled = true;
+                    showNotification("Scanner stopped", "warning");
+                }).catch((err) => {
+                    console.error(`Unable to stop scanning: ${err}`);
+                });
+            }
+        }
+
+        // Check voter status in Firebase
+        function checkVoterStatus(voterId) {
+            showNotification("Checking voter status...", "success");
+
+            // Query Firebase for the voter
+            db.collection("voters").doc(voterId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const voterData = doc.data();
+                        displayVoterResult(voterData);
+                    } else {
+                        // If not found by ID, try to find by any field that might contain the ID
+                        db.collection("voters").where("uid", "==", voterId).get()
+                            .then((querySnapshot) => {
+                                if (querySnapshot.size > 0) {
+                                    const voterData = querySnapshot.docs[0].data();
+                                    displayVoterResult(voterData);
+                                } else {
+                                    showNotification("Voter not found in the database", "error");
+                                    displayNotFoundResult(voterId);
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error searching for voter:", error);
+                                showNotification("Error searching for voter", "error");
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error getting voter document:", error);
+                    showNotification("Error retrieving voter information", "error");
+                });
+        }
+
+        // Display voter result - simplified for ZKP
+        function displayVoterResult(voterData) {
+            // Reset classes
+            resultIcon.className = 'result-icon';
+
+            // Get the voter name - specifically looking for "fullname" field first
+            const voterName = voterData.fullname ||
+                voterData.fullName ||
+                voterData.name ||
+                voterData.voterName ||
+                voterData.displayName ||
+                "Unknown";
+
+            // Log the voter data for debugging
+            console.log("Voter data:", voterData);
+            console.log("Voter name:", voterName);
+            console.log("Available fields:", Object.keys(voterData));
+
+            if (voterData.status === 'verified') {
+                resultIcon.classList.add('success-icon');
+                resultIcon.innerHTML = '<i class="fas fa-check"></i>';
+                resultMessage.innerHTML = `This voter <span style="color: var(--success-color); font-weight: 500;">${voterName}</span> is eligible for vote`;
+                showNotification("Voter is eligible to vote", "success");
+            } else if (voterData.status === 'pending') {
+                resultIcon.classList.add('warning-icon');
+                resultIcon.innerHTML = '<i class="fas fa-exclamation"></i>';
+                resultMessage.innerHTML = `This voter <span style="color: var(--warning-color); font-weight: 500;">${voterName}</span> has pending verification status`;
+                showNotification("Voter verification is pending", "warning");
+            } else {
+                resultIcon.classList.add('error-icon');
+                resultIcon.innerHTML = '<i class="fas fa-times"></i>';
+                resultMessage.innerHTML = `This voter <span style="color: var(--error-color); font-weight: 500;">${voterName}</span> is not eligible to vote`;
+                showNotification("Voter is not eligible to vote", "error");
+            }
+
+            // Show result container
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Display not found result
+        function displayNotFoundResult(voterId) {
+            resultIcon.className = 'result-icon error-icon';
+            resultIcon.innerHTML = '<i class="fas fa-user-slash"></i>';
+            resultMessage.innerHTML = `No voter found with ID: <span style="color: var(--error-color); font-weight: 500;">${voterId}</span>`;
+
+            // Show result container
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            notificationMessage.textContent = message;
+            notification.className = 'notification';
+
+            if (type === 'success') {
+                notification.classList.add('notification-success');
+                notificationIcon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                notification.classList.add('notification-error');
+                notificationIcon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'warning') {
+                notification.classList.add('notification-warning');
+                notificationIcon.className = 'fas fa-exclamation-triangle';
+            }
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking on overlay
+        function closeMobileMenu() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        // Event Listeners
+        startScanBtn.addEventListener('click', startScanner);
+        stopScanBtn.addEventListener('click', stopScanner);
+        manualCheckBtn.addEventListener('click', () => {
+            const voterId = manualVoterId.value.trim();
+            if (voterId) {
+                checkVoterStatus(voterId);
+            } else {
+                showNotification("Please enter a valid Voter ID", "error");
+            }
+        });
+        newScanBtn.addEventListener('click', () => {
+            resultContainer.style.display = 'none';
+            manualVoterId.value = '';
+        });
+
+        // Mobile menu event listeners
+        hamburger.addEventListener('click', toggleMobileMenu);
+        overlay.addEventListener('click', closeMobileMenu);
+
+        // Initialize scanner on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeScanner();
+        });
+
+        // Handle Enter key in manual input
+        manualVoterId.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                manualCheckBtn.click();
+            }
+        });
+    </script>
+</body>
+
+</html>
