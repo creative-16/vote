@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>OTP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded-2xl shadow-xl w-96 text-center relative">
+    <h2 class="text-2xl font-bold mb-4 text-pink-500">Your OTP</h2>
+    <p class="text-gray-600 mb-4">Copy this OTP and paste it in the login page:</p>
+
+    <div id="otp-box" class="text-3xl font-mono font-bold bg-gray-100 p-4 rounded-lg border mb-4"></div>
+
+    <button id="copy-btn"
+      class="w-full bg-pink-500 text-white py-2 rounded-xl mb-4 flex justify-center items-center hover:bg-pink-600 transition-colors">
+      <span id="copy-btn-text">Copy OTP</span>
+      <svg id="copy-btn-spinner" class="hidden ml-2 w-5 h-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg"
+        fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+    </button>
+
+    <p class="text-sm text-gray-500 mb-2">⚠️ This page will close automatically in <span id="countdown">30</span>
+      seconds.</p>
+    <p class="text-sm text-gray-400">Make sure to paste it in the login form before time runs out.</p>
+  </div>
+
+  <script>
+    const otp = sessionStorage.getItem("temp_otp");
+    const otpBox = document.getElementById("otp-box");
+    otpBox.textContent = otp || "OTP Expired";
+
+    const expiry = parseInt(sessionStorage.getItem("temp_otp_expiry") || "0");
+    const countdownEl = document.getElementById("countdown");
+
+    // Countdown timer
+    function updateCountdown() {
+      const remaining = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+      countdownEl.textContent = remaining;
+
+      if (remaining <= 0) {
+        otpBox.textContent = "OTP Expired";
+        clearInterval(timer);
+        setTimeout(() => window.close(), 1000);
+      }
+    }
+
+    const timer = setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Copy button functionality with spinner
+    const copyBtn = document.getElementById("copy-btn");
+    const copyText = document.getElementById("copy-btn-text");
+    const copySpinner = document.getElementById("copy-btn-spinner");
+
+    copyBtn.addEventListener("click", () => {
+      if (!otp) {
+        copyText.textContent = "OTP Expired";
+        return;
+      }
+
+      // Show spinner and disable button
+      copyBtn.disabled = true;
+      copySpinner.classList.remove("hidden");
+      copyText.textContent = "Copying...";
+
+      navigator.clipboard.writeText(otp).then(() => {
+        // Show "Copied!" after 1s
+        setTimeout(() => {
+          copySpinner.classList.add("hidden");
+          copyText.textContent = "Copied!";
+        }, 1000);
+
+        // Revert back to original text after 1.5s
+        setTimeout(() => {
+          copyText.textContent = "Copy OTP";
+          copyBtn.disabled = false;
+        }, 2500);
+      }).catch(err => {
+        copySpinner.classList.add("hidden");
+        copyText.textContent = "Failed!";
+        console.error(err);
+        setTimeout(() => {
+          copyText.textContent = "Copy OTP";
+          copyBtn.disabled = false;
+        }, 2000);
+      });
+    });
+
+    // Auto-close page when time expires
+    setTimeout(() => {
+      if (!window.closed) window.close();
+    }, Math.max(0, expiry - Date.now()));
+  </script>
+</body>
+
+</html>
