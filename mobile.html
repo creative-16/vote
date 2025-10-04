@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +11,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
             display: flex;
             justify-content: center;
@@ -22,7 +21,7 @@
             color: #333;
             padding: 20px;
         }
-
+        
         .container {
             background-color: white;
             border-radius: 20px;
@@ -32,25 +31,25 @@
             width: 100%;
             max-width: 400px;
         }
-
+        
         h1 {
             color: #333;
             margin-bottom: 10px;
             font-size: 24px;
         }
-
+        
         .subtitle {
             color: #666;
             margin-bottom: 20px;
             font-size: 16px;
         }
-
+        
         .fingerprint-icon {
             font-size: 64px;
             margin: 20px 0;
             color: #6a11cb;
         }
-
+        
         .tab-container {
             display: flex;
             margin-bottom: 20px;
@@ -58,7 +57,7 @@
             overflow: hidden;
             background-color: #f0f0f0;
         }
-
+        
         .tab {
             flex: 1;
             padding: 12px;
@@ -68,21 +67,21 @@
             transition: all 0.3s ease;
             font-weight: 500;
         }
-
+        
         .tab.active {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
         }
-
+        
         .tab-content {
             display: none;
             margin-bottom: 20px;
         }
-
+        
         .tab-content.active {
             display: block;
         }
-
+        
         #qr-reader {
             width: 100%;
             max-width: 300px;
@@ -90,17 +89,17 @@
             border-radius: 10px;
             overflow: hidden;
         }
-
+        
         #qr-reader video {
             width: 100%;
             height: auto;
             border-radius: 10px;
         }
-
+        
         .manual-input {
             margin: 20px 0;
         }
-
+        
         .manual-input input {
             width: 100%;
             padding: 15px;
@@ -110,12 +109,12 @@
             margin-bottom: 15px;
             transition: border-color 0.3s ease;
         }
-
+        
         .manual-input input:focus {
             outline: none;
             border-color: #6a11cb;
         }
-
+        
         .status {
             margin: 20px 0;
             padding: 15px;
@@ -123,25 +122,31 @@
             font-weight: bold;
             display: none;
         }
-
+        
         .status.success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-
+        
         .status.error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-
+        
         .status.info {
             background-color: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
-
+        
+        .status.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
         button {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
@@ -155,23 +160,23 @@
             margin: 10px 0;
             width: 100%;
         }
-
+        
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
         }
-
+        
         button:active {
             transform: translateY(0);
         }
-
+        
         button:disabled {
             background: #cccccc;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-
+        
         .session-info {
             font-size: 14px;
             color: #888;
@@ -180,12 +185,12 @@
             background-color: #f8f9fa;
             border-radius: 10px;
         }
-
+        
         .loading {
             display: none;
             margin: 20px 0;
         }
-
+        
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
@@ -195,40 +200,12 @@
             animation: spin 1s linear infinite;
             margin: 0 auto;
         }
-
+        
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        .instructions {
-            font-size: 14px;
-            color: #666;
-            margin: 20px 0;
-            text-align: left;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .instructions h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .instructions ol {
-            margin-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 5px;
-        }
-
+        
         .camera-permission {
             display: none;
             padding: 15px;
@@ -238,36 +215,66 @@
             margin-bottom: 20px;
             color: #856404;
         }
+        
+        .auth-methods {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .auth-methods button {
+            flex: 1;
+        }
+        
+        .simple-auth {
+            display: none;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .simple-auth input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .simple-auth input:focus {
+            outline: none;
+            border-color: #6a11cb;
+        }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="fingerprint-icon">🔐</div>
         <h1>Fingerprint Authentication</h1>
         <p class="subtitle">Connect to your desktop session</p>
-
+        
         <div class="tab-container">
             <button class="tab active" onclick="switchTab('scan')">Scan QR</button>
             <button class="tab" onclick="switchTab('manual')">Manual Entry</button>
         </div>
-
+        
         <div class="camera-permission" id="cameraPermission">
             Camera permission is required to scan QR codes. Please allow camera access.
         </div>
-
+        
         <!-- QR Scanner Tab -->
         <div id="scan-tab" class="tab-content active">
             <div id="qr-reader">
                 <video id="qr-video" style="display: none;"></video>
                 <canvas id="qr-canvas" style="display: none;"></canvas>
-                <div id="qr-scan-region"
-                    style="position: relative; width: 100%; height: 250px; background-color: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <div id="qr-scan-region" style="position: relative; width: 100%; height: 250px; background-color: #f0f0f0; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
                     <button id="startScanBtn" style="width: 80%;">Start Camera</button>
                 </div>
             </div>
         </div>
-
+        
         <!-- Manual Entry Tab -->
         <div id="manual-tab" class="tab-content">
             <div class="manual-input">
@@ -275,28 +282,45 @@
                 <button id="connectBtn">Connect</button>
             </div>
         </div>
-
+        
         <div class="session-info" id="sessionInfo" style="display: none;">
             Session ID: <span id="sessionId"></span>
         </div>
-
-        <button id="verifyBtn" style="display: none;">Verify Fingerprint</button>
-
+        
+        <div id="authSection" style="display: none;">
+            <div class="auth-methods">
+                <button id="verifyBtn">🔐 Biometric</button>
+                <button id="simpleAuthBtn">🔑 Simple Auth</button>
+            </div>
+            
+            <div class="simple-auth" id="simpleAuth">
+                <p style="margin-bottom: 15px; color: #666;">Enter a simple code to authenticate:</p>
+                <input type="password" id="authCode" placeholder="Enter code (e.g., 1234)" />
+                <button id="verifySimpleBtn">Verify Code</button>
+            </div>
+        </div>
+        
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Verifying fingerprint...</p>
+            <p id="loadingText">Processing...</p>
         </div>
-
+        
         <div class="status" id="status"></div>
     </div>
 
     <!-- QR Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const verifyBtn = document.getElementById('verifyBtn');
+            const simpleAuthBtn = document.getElementById('simpleAuthBtn');
+            const verifySimpleBtn = document.getElementById('verifySimpleBtn');
+            const authCode = document.getElementById('authCode');
+            const simpleAuth = document.getElementById('simpleAuth');
+            const authSection = document.getElementById('authSection');
             const loadingDiv = document.getElementById('loading');
+            const loadingText = document.getElementById('loadingText');
             const statusDiv = document.getElementById('status');
             const sessionInfoDiv = document.getElementById('sessionInfo');
             const sessionIdSpan = document.getElementById('sessionId');
@@ -304,22 +328,23 @@
             const connectBtn = document.getElementById('connectBtn');
             const startScanBtn = document.getElementById('startScanBtn');
             const cameraPermissionDiv = document.getElementById('cameraPermission');
-
+            
             let sessionId = null;
             let html5QrCode = null;
-
+            let hasPasskey = false;
+            
             // Initialize QR Scanner
             function initQRScanner() {
                 html5QrCode = new Html5Qrcode("qr-scan-region");
             }
-
+            
             // Start QR Scanner
             startScanBtn.addEventListener('click', () => {
                 startScanBtn.style.display = 'none';
                 cameraPermissionDiv.style.display = 'block';
-
+                
                 initQRScanner();
-
+                
                 html5QrCode.start(
                     { facingMode: "environment" },
                     {
@@ -327,7 +352,6 @@
                         qrbox: { width: 250, height: 250 }
                     },
                     (decodedText, decodedResult) => {
-                        // QR Code scanned successfully
                         html5QrCode.stop();
                         handleQRCode(decodedText);
                     },
@@ -342,20 +366,16 @@
                     switchTab('manual');
                 });
             });
-
+            
             // Handle scanned QR code
             function handleQRCode(qrText) {
                 try {
                     const url = new URL(qrText);
                     const params = new URLSearchParams(url.search);
                     const session = params.get('session');
-
+                    
                     if (session) {
-                        sessionId = session;
-                        sessionIdSpan.textContent = sessionId;
-                        sessionInfoDiv.style.display = 'block';
-                        verifyBtn.style.display = 'block';
-                        showStatus('Connected to desktop session!', 'success');
+                        connectToSession(session);
                     } else {
                         showStatus('Invalid QR code. Please scan the correct QR code.', 'error');
                     }
@@ -363,122 +383,202 @@
                     showStatus('Invalid QR code format.', 'error');
                 }
             }
-
+            
             // Manual connection
             connectBtn.addEventListener('click', () => {
                 const manualSessionId = sessionIdInput.value.trim();
-
+                
                 if (manualSessionId) {
-                    sessionId = manualSessionId;
-                    sessionIdSpan.textContent = sessionId;
-                    sessionInfoDiv.style.display = 'block';
-                    verifyBtn.style.display = 'block';
-                    showStatus('Connected to desktop session!', 'success');
+                    connectToSession(manualSessionId);
                 } else {
                     showStatus('Please enter a valid Session ID.', 'error');
                 }
             });
-
+            
+            // Connect to session
+            function connectToSession(session) {
+                sessionId = session;
+                sessionIdSpan.textContent = sessionId;
+                sessionInfoDiv.style.display = 'block';
+                authSection.style.display = 'block';
+                showStatus('Connected to desktop session!', 'success');
+                
+                // Check if passkey exists
+                checkPasskeyAvailability();
+            }
+            
+            // Check passkey availability
+            async function checkPasskeyAvailability() {
+                try {
+                    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                    if (!available) {
+                        showStatus('Biometric authentication not available. Use Simple Auth instead.', 'warning');
+                        verifyBtn.disabled = true;
+                    }
+                } catch (error) {
+                    console.error('Error checking passkey availability:', error);
+                }
+            }
+            
+            // Simple authentication button
+            simpleAuthBtn.addEventListener('click', () => {
+                simpleAuth.style.display = simpleAuth.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Simple authentication
+            verifySimpleBtn.addEventListener('click', () => {
+                const code = authCode.value.trim();
+                
+                if (code === '1234' || code === '0000') { // Default codes for demo
+                    authenticateSuccess();
+                } else {
+                    showStatus('Invalid code. Try 1234 or 0000', 'error');
+                }
+            });
+            
             // Tab switching
-            window.switchTab = function (tabName) {
-                // Update tab buttons
+            window.switchTab = function(tabName) {
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.classList.remove('active');
                 });
                 event.target.classList.add('active');
-
-                // Update tab content
+                
                 document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');
                 });
-
+                
                 if (tabName === 'scan') {
                     document.getElementById('scan-tab').classList.add('active');
                 } else {
                     document.getElementById('manual-tab').classList.add('active');
                 }
             };
-
-            // Check if Web Authentication API is available
-            if (!window.PublicKeyCredential) {
-                showStatus('Your browser does not support Web Authentication API. Please try a different browser.', 'error');
-                if (verifyBtn) verifyBtn.disabled = true;
-            }
-
-            // Verify fingerprint
+            
+            // Biometric authentication
             verifyBtn.addEventListener('click', async () => {
                 if (!sessionId) return;
-
+                
                 try {
-                    // Show loading
                     loadingDiv.style.display = 'block';
+                    loadingText.textContent = 'Checking for existing passkey...';
                     verifyBtn.disabled = true;
-
-                    // Check if biometric authentication is available
-                    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-
-                    if (!available) {
-                        throw new Error('Biometric authentication is not available on this device.');
-                    }
-
-                    // Create a credential request
-                    const challenge = new Uint8Array(32);
-                    window.crypto.getRandomValues(challenge);
-
-                    const credentialRequestOptions = {
-                        challenge: challenge,
-                        allowCredentials: [],
-                        userVerification: 'required',
-                        timeout: 60000
-                    };
-
-                    // Request authentication
-                    const credential = await navigator.credentials.get({
-                        publicKey: credentialRequestOptions
-                    });
-
-                    if (credential) {
-                        // Authentication successful
-                        showStatus('Authentication successful!', 'success');
-
-                        // Update session status in localStorage
-                        localStorage.setItem(sessionId, JSON.stringify({
-                            status: 'verified',
-                            timestamp: Date.now()
-                        }));
-
-                        // Redirect after a delay
-                        setTimeout(() => {
-                            window.location.href = 'desktop.html';
-                        }, 2000);
-                    } else {
-                        throw new Error('Authentication failed.');
+                    
+                    // First try to authenticate with existing passkey
+                    try {
+                        const challenge = new Uint8Array(32);
+                        window.crypto.getRandomValues(challenge);
+                        
+                        const credentialRequestOptions = {
+                            challenge: challenge,
+                            allowCredentials: [],
+                            userVerification: 'required',
+                            timeout: 60000
+                        };
+                        
+                        const credential = await navigator.credentials.get({
+                            publicKey: credentialRequestOptions
+                        });
+                        
+                        if (credential) {
+                            authenticateSuccess();
+                            return;
+                        }
+                    } catch (getError) {
+                        console.log('No existing passkey found, creating new one...');
+                        
+                        // If no passkey exists, create one
+                        loadingText.textContent = 'Creating new passkey...';
+                        
+                        const createChallenge = new Uint8Array(32);
+                        window.crypto.getRandomValues(createChallenge);
+                        
+                        const userId = new Uint8Array(16);
+                        window.crypto.getRandomValues(userId);
+                        
+                        const createCredentialOptions = {
+                            challenge: createChallenge,
+                            rp: {
+                                name: "Fingerprint Unlock System",
+                                id: window.location.hostname
+                            },
+                            user: {
+                                id: userId,
+                                name: "user@" + window.location.hostname,
+                                displayName: "Mobile User"
+                            },
+                            pubKeyCredParams: [
+                                { alg: -7, type: "public-key" },
+                                { alg: -257, type: "public-key" }
+                            ],
+                            authenticatorSelection: {
+                                authenticatorAttachment: "platform",
+                                userVerification: "required"
+                            },
+                            timeout: 60000
+                        };
+                        
+                        const newCredential = await navigator.credentials.create({
+                            publicKey: createCredentialOptions
+                        });
+                        
+                        if (newCredential) {
+                            loadingText.textContent = 'Authenticating with new passkey...';
+                            
+                            // Now try to authenticate with the newly created passkey
+                            const authChallenge = new Uint8Array(32);
+                            window.crypto.getRandomValues(authChallenge);
+                            
+                            const authOptions = {
+                                challenge: authChallenge,
+                                allowCredentials: [{
+                                    id: newCredential.rawId,
+                                    type: 'public-key',
+                                    transports: ['internal']
+                                }],
+                                userVerification: 'required',
+                                timeout: 60000
+                            };
+                            
+                            const authCredential = await navigator.credentials.get({
+                                publicKey: authOptions
+                            });
+                            
+                            if (authCredential) {
+                                authenticateSuccess();
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error('Authentication error:', error);
-                    showStatus('Authentication failed: ' + error.message, 'error');
-
-                    // Update session status in localStorage
-                    if (sessionId) {
-                        localStorage.setItem(sessionId, JSON.stringify({
-                            status: 'failed',
-                            timestamp: Date.now()
-                        }));
-                    }
+                    showStatus('Biometric authentication failed. Try Simple Auth instead.', 'error');
                 } finally {
-                    // Hide loading
                     loadingDiv.style.display = 'none';
                     verifyBtn.disabled = false;
                 }
             });
-
+            
+            // Authentication success
+            function authenticateSuccess() {
+                showStatus('Authentication successful!', 'success');
+                
+                // Update session status in localStorage
+                localStorage.setItem(sessionId, JSON.stringify({
+                    status: 'verified',
+                    timestamp: Date.now()
+                }));
+                
+                // Redirect after a delay
+                setTimeout(() => {
+                    window.location.href = 'desktop.html';
+                }, 2000);
+            }
+            
             // Show status message
             function showStatus(message, type) {
                 statusDiv.textContent = message;
                 statusDiv.className = 'status ' + type;
                 statusDiv.style.display = 'block';
-
-                // Auto hide success messages after 3 seconds
+                
                 if (type === 'success') {
                     setTimeout(() => {
                         statusDiv.style.display = 'none';
@@ -488,5 +588,4 @@
         });
     </script>
 </body>
-
 </html>
