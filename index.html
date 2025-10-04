@@ -6,6 +6,216 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- REMOVE these if present (they cause duplicate init):
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+    -->
+    <script type="module">
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // --- Firebase config & initialization ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
+            authDomain: "vote-edb06.firebaseapp.com",
+            projectId: "vote-edb06",
+            storageBucket: "vote-edb06.appspot.com",
+            messagingSenderId: "916721565065",
+            appId: "1:916721565065:web:2a451c1b45173d8b127558"
+        };
+
+        let app;
+        if (!getApps().length) {
+            app = initializeApp(firebaseConfig);
+            console.log("Firebase initialized new app");
+        } else {
+            app = getApps()[0];
+            console.log("Firebase using existing app");
+        }
+
+        const db = getFirestore(app);
+
+        // --- DOM elements ---
+        const phoneSection = document.getElementById("phone-section");
+        const otpSection = document.getElementById("otp-section");
+        const btn = document.getElementById("otp-btn");
+        const btnText = document.getElementById("otp-btn-text");
+        const spinner = document.getElementById("otp-loading");
+        const otpInput = document.getElementById("otp-code");
+        const verifyBtn = document.getElementById("verify-btn");
+        const phoneInput = document.getElementById("new-phone");
+
+        // Autofill last phone
+        const savedPhone = localStorage.getItem("lastPhone");
+        if (savedPhone) phoneInput.value = savedPhone;
+
+        // --- Universal login ---
+        window.handleLogin = async function (role) {
+            try {
+                const id = document.getElementById(`${role}-id`).value.trim();
+                const passcode = document.getElementById(`${role}-passcode`).value.trim();
+                if (!id || !passcode) return alert("Please enter both fields.");
+
+                const q = query(collection(db, `${role}s`), where("id", "==", id), where("passcode", "==", passcode));
+                const snapshot = await getDocs(q);
+
+                if (!snapshot.empty) {
+                    sessionStorage.setItem("userId", id);
+                    sessionStorage.setItem("userRole", role);
+                    window.location.href = `${role}-dashboard.html`;
+                } else alert("Invalid ID or Passcode");
+            } catch (err) {
+                console.error("handleLogin error:", err);
+                alert("Login error (see console)");
+            }
+        };
+
+        // --- Existing voter login with fallbacks ---
+        window.handleExistingLogin = async function () {
+            try {
+                const username = document.getElementById("existing-username").value.trim();
+                const password = document.getElementById("existing-password").value.trim();
+                if (!username || !password) return alert("Please enter both Username and Password");
+
+                const runQuery = async (fieldA, valA, fieldB, valB) => {
+                    const q = query(collection(db, "voters"), where(fieldA, "==", valA), where(fieldB, "==", valB));
+                    return await getDocs(q);
+                };
+
+                let snap;
+
+                // Try multiple combinations
+                snap = await runQuery("username", username, "password", password);
+                if (!snap.empty) return loginSuccess(username);
+                snap = await runQuery("id", username, "passcode", password);
+                if (!snap.empty) return loginSuccess(username);
+                if (/^\d+$/.test(password)) {
+                    snap = await runQuery("id", username, "passcode", Number(password));
+                    if (!snap.empty) return loginSuccess(username);
+                    if (/^\d+$/.test(username)) {
+                        snap = await runQuery("id", Number(username), "passcode", Number(password));
+                        if (!snap.empty) return loginSuccess(username);
+                    }
+                }
+                snap = await runQuery("username", username, "passcode", password);
+                if (!snap.empty) return loginSuccess(username);
+                snap = await runQuery("id", username, "password", password);
+                if (!snap.empty) return loginSuccess(username);
+
+                alert("Invalid Username or Password. (Checked multiple field combinations — see console)");
+                console.warn("Login failed: multiple field combinations checked.");
+            } catch (err) {
+                console.error("handleExistingLogin error:", err);
+                alert("Login error (see console)");
+            }
+        };
+
+        function loginSuccess(userId) {
+            sessionStorage.setItem("userId", userId);
+            sessionStorage.setItem("userRole", "voter");
+            window.location.href = "voter-dashboard.html";
+        }
+
+        // --- Send OTP ---
+        btn.addEventListener("click", async () => {
+            const phone = phoneInput.value.trim();
+            const phoneMsg = document.getElementById("phone-msg");
+
+            // Clear previous message and hide it
+            phoneMsg.textContent = "";
+            phoneMsg.classList.add("hidden");
+
+            // Validate phone format
+            if (!/^\+91 \d{5} \d{5}$/.test(phone)) {
+                phoneMsg.textContent = "Enter phone number in format +91 XXXXX XXXXX";
+                phoneMsg.classList.remove("hidden"); // show message
+                return;
+            }
+
+            // Save phone for autofill
+            localStorage.setItem("lastPhone", phone);
+
+            // Disable button and show spinner
+            btn.disabled = true;
+            btnText.textContent = "Checking...";
+            spinner.classList.remove("hidden");
+
+            try {
+                const phoneDocRef = doc(db, "voters", phone);
+                const phoneDoc = await getDoc(phoneDocRef);
+
+                // If document exists
+                if (phoneDoc.exists()) {
+                    const data = phoneDoc.data();
+                    // If username & password exist → fully registered
+                    if (data.username && data.password) {
+                        phoneMsg.textContent = "Phone number already registered!";
+                        phoneMsg.classList.remove("hidden"); // show message
+                        return;
+                    }
+                    // Otherwise, allow sending OTP
+                }
+
+                // Generate OTP
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                sessionStorage.setItem("temp_otp", otp);
+                sessionStorage.setItem("temp_phone", phone);
+                sessionStorage.setItem("temp_otp_expiry", Date.now() + 30000);
+
+                window.open("tempotp.html", "_blank");
+
+                // Toggle sections
+                phoneSection.classList.add("hidden");
+                otpSection.classList.remove("hidden");
+
+            } catch (err) {
+                console.error("Error checking phone:", err);
+                phoneMsg.textContent = "Error accessing database. Check console.";
+                phoneMsg.classList.remove("hidden"); // show error message
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = "Get OTP";
+                spinner.classList.add("hidden");
+            }
+        });
+
+
+
+        // --- Verify OTP ---
+        verifyBtn.addEventListener("click", async () => {
+            const entered = otpInput.value.trim();
+            const otp = sessionStorage.getItem("temp_otp");
+            const expiry = parseInt(sessionStorage.getItem("temp_otp_expiry") || "0");
+            const phone = sessionStorage.getItem("temp_phone");
+
+            const btnTextEl = document.getElementById("btn-text");
+            const btnSpinner = document.getElementById("btn-spinner");
+            verifyBtn.disabled = true;
+            btnTextEl.classList.add("hidden"); btnSpinner.classList.remove("hidden");
+
+            if (!otp || Date.now() > expiry) {
+                btnTextEl.classList.remove("hidden"); btnSpinner.classList.add("hidden"); verifyBtn.disabled = false;
+                alert("OTP expired. Please request again.");
+                otpSection.classList.add("hidden"); phoneSection.classList.remove("hidden");
+                return;
+            }
+
+            if (entered === otp) {
+                try {
+                    await setDoc(doc(db, "voters", phone), { phone: phone, createdAt: new Date() });
+                    setTimeout(() => window.location.href = "registration.html", 500);
+                } catch (err) {
+                    console.error(err); alert("Failed to save phone number. Check console.");
+                    btnTextEl.classList.remove("hidden"); btnSpinner.classList.add("hidden"); verifyBtn.disabled = false;
+                }
+            } else {
+                alert("Invalid OTP, please try again.");
+                btnTextEl.classList.remove("hidden"); btnSpinner.classList.add("hidden"); verifyBtn.disabled = false;
+            }
+        });
+    </script>
+
+
 </head>
 
 <body
@@ -67,27 +277,144 @@
                         }
                     });
                 }
+
             </script>
 
 
 
 
-            <!-- Voter Login Tab -->
             <div id="voter-login-tab" class="hidden p-6">
                 <h2 class="text-2xl font-bold text-center mb-6 text-white">Voter Login</h2>
-                <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl space-y-2">
-                    <input id="voter-id" type="text" placeholder="Enter ID"
-                        class="w-full px-4 py-3 border rounded-xl" />
-                    <input id="voter-passcode" type="text" placeholder="Enter Passcode"
-                        class="w-full px-4 py-3 border rounded-xl" />
-                    <button onclick="handleLogin('voter')"
-                        class="w-full bg-pink-500 text-white py-3 rounded-xl">Login</button>
-                    <button onclick="showTab('role-select-tab')" class="w-full text-sm text-gray-500 mt-2">←
+
+                <div class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl">
+                    <!-- Tab Buttons -->
+                    <div class="flex mb-6 border-b">
+                        <button id="existing-tab-btn" onclick="switchVoterTab('existing')"
+                            class="flex-1 py-2 text-center font-semibold border-b-2 border-pink-500 text-pink-500">
+                            Existing Voter
+                        </button>
+                        <button id="new-tab-btn" onclick="switchVoterTab('new')"
+                            class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-gray-500 hover:text-pink-500">
+                            New Voter
+                        </button>
+                    </div>
+
+                    <!-- Existing Voter Form (Visible initially) -->
+                    <div id="existing-voter-form" class="space-y-3">
+                        <input id="existing-username" type="text" placeholder="Enter Username"
+                            class="w-full px-4 py-3 border rounded-xl" />
+                        <input id="existing-password" type="password" placeholder="Enter Password"
+                            class="w-full px-4 py-3 border rounded-xl" />
+                        <button onclick="handleExistingLogin()"
+                            class="w-full bg-pink-500 text-white py-3 rounded-xl">Login</button>
+                        <button onclick="alert('Forgot password feature coming soon!')"
+                            class="w-full text-sm text-pink-500 mt-2 hover:underline">Forgot Password?</button>
+                    </div>
+
+                    <!-- New Voter Form (Hidden initially) -->
+                    <div id="new-voter-form" class="space-y-3 hidden">
+                        <!-- Phone input section -->
+                        <div id="phone-section" class="space-y-3">
+                            <input id="new-phone" type="tel" placeholder="+91 XXXXX XXXXX"
+                                class="w-full px-4 py-3 border rounded-xl" value="+91 " maxlength="15" />
+                            <p id="phone-msg" class="text-red-500 mt-1 hidden"></p>
+
+
+
+
+                            <script>
+                                const phoneIn = document.getElementById('new-phone');
+
+                                phoneIn.addEventListener('input', (e) => {
+                                    let val = e.target.value.replace(/\D/g, ''); // remove non-digits
+                                    if (val.startsWith('91')) val = val.slice(2); // remove leading 91 if typed
+                                    if (val.length > 10) val = val.slice(0, 10); // limit to 10 digits
+
+                                    // Add space after 5 digits
+                                    if (val.length > 5) val = val.slice(0, 5) + ' ' + val.slice(5);
+
+                                    e.target.value = '+91 ' + val;
+                                });
+                            </script>
+
+
+                            <button id="otp-btn"
+                                class="w-full bg-pink-500 text-white py-3 rounded-xl flex justify-center items-center">
+                                <span id="otp-btn-text">Get OTP</span>
+                                <svg id="otp-loading" class="hidden ml-2 w-5 h-5 animate-spin text-white"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4">
+                                    </circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- OTP verification section (hidden initially) -->
+                        <div id="otp-section" class="hidden space-y-3 mt-4">
+                            <input id="otp-code" type="text" placeholder="Enter OTP"
+                                class="w-full px-4 py-3 border rounded-xl" />
+                            <button id="verify-btn"
+                                class="w-full bg-green-500 text-white py-3 rounded-xl flex justify-center items-center gap-2">
+                                <span id="btn-text">Verify OTP</span>
+                                <svg id="btn-spinner" class="hidden w-5 h-5 animate-spin text-white"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <!-- Back Button -->
+                    <button onclick="showTab('role-select-tab')" class="w-full text-sm text-gray-500 mt-6">←
                         Back</button>
                 </div>
             </div>
 
-            <!-- Candidate Login Tab -->
+
+
+
+            <script>
+                function switchVoterTab(tab) {
+                    const existingBtn = document.getElementById("existing-tab-btn");
+                    const newBtn = document.getElementById("new-tab-btn");
+                    const existingForm = document.getElementById("existing-voter-form");
+                    const newForm = document.getElementById("new-voter-form");
+
+                    if (tab === "existing") {
+                        // Show existing voter form
+                        existingForm.classList.remove("hidden");
+                        newForm.classList.add("hidden");
+
+                        // Active style for Existing button
+                        existingBtn.classList.add("border-pink-500", "text-pink-500");
+                        existingBtn.classList.remove("text-gray-500", "border-transparent");
+
+                        // Reset style for New button
+                        newBtn.classList.remove("border-pink-500", "text-pink-500");
+                        newBtn.classList.add("text-gray-500", "border-transparent");
+                    } else {
+                        // Show new voter form
+                        existingForm.classList.add("hidden");
+                        newForm.classList.remove("hidden");
+
+                        // Active style for New button
+                        newBtn.classList.add("border-pink-500", "text-pink-500");
+                        newBtn.classList.remove("text-gray-500", "border-transparent");
+
+                        // Reset style for Existing button
+                        existingBtn.classList.remove("border-pink-500", "text-pink-500");
+                        existingBtn.classList.add("text-gray-500", "border-transparent");
+                    }
+                }
+            </script>
+
             <!-- Candidate Login Tab -->
             <div id="candidate-login-tab" class="hidden p-6">
                 <h2 class="text-2xl font-bold text-center mb-6 text-white">Candidate Login</h2>
@@ -134,50 +461,7 @@
     </div>
 
 
-    <!-- Include Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsqxp46x8mwXRpThRdpxsskRM1ie4PNCg",
-            authDomain: "vote-edb06.firebaseapp.com",
-            projectId: "vote-edb06",
-            storageBucket: "vote-edb06.appspot.com",
-            messagingSenderId: "916721565065",
-            appId: "1:916721565065:web:2a451c1b45173d8b127558",
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.handleLogin = async function (role) {
-            const id = document.getElementById(`${role}-id`).value.trim();
-            const passcode = document.getElementById(`${role}-passcode`).value.trim();
-
-            const q = query(
-                collection(db, `${role}s`),
-                where("id", "==", id),
-                where("passcode", "==", passcode)
-            );
-
-            const snapshot = await getDocs(q);
-
-            if (!snapshot.empty) {
-                sessionStorage.setItem("userId", id);        // Save candidate ID
-                sessionStorage.setItem("userRole", role);    // Optional: save role
-                window.location.href = `${role}-dashboard.html`;
-            } else {
-                alert("Invalid ID or Passcode");
-            }
-
-        };
-
-    </script>
 
 
 
