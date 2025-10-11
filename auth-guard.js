@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Redirect based on role
         if (expectedRole === "admin") {
-            window.location.href = "/admin.html";
+            window.location.href = "vote/admin.html";
         } else {
             window.location.href = "/index.html";
         }
@@ -24,3 +24,4 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.remove("logged-out");
     }
 });
+
