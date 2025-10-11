@@ -40,7 +40,7 @@
         <div
             class="w-full md:w-20 bg-orange-400 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none flex md:flex-col items-center justify-center md:justify-start py-4 md:py-6 gap-6 shadow-inner">
             <button onclick="openTab(0)" class="text-white text-2xl bg-white/80 rounded-xl p-3">🏠</button>
-            <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">📝</button>
+            <button onclick="openTab(1)" class="text-white text-2xl bg-white/80 rounded-xl p-3">😊</button>
             <button onclick="openTab(2)" class="text-white text-2xl bg-white/80 rounded-xl p-3">👤</button>
         </div>
 
@@ -57,18 +57,63 @@
 
                     <!-- Left Column: Profile, Clock, Voting Status -->
                     <div class="flex flex-col gap-4">
-                        <!-- Profile Overview Section -->
                         <div id="profileCard"
                             class="bg-white shadow-lg rounded-xl p-4 cursor-pointer transition hover:scale-[1.02]"
                             onclick="openTab(2)">
                             <div class="flex items-center gap-3">
                                 <img src="./pic/1.png" alt="V" class="w-12 h-12 rounded-full object-cover">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-gray-800" id="profileName">Voter Name</h3>
-                                    <p class="text-sm text-gray-500" id="profileDept">Department</p>
+                                    <h3 class="text-lg font-semibold text-gray-800" id="profileName">Loading...</h3>
+                                    <p class="text-sm text-gray-500" id="profileDept">@username</p>
                                 </div>
                             </div>
                         </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', async () => {
+                                // Get references to the HTML elements
+                                const profileNameEl = document.getElementById('profileName');
+                                const profileDeptEl = document.getElementById('profileDept');
+
+                                // Get the userId from sessionStorage
+                                const userId = sessionStorage.getItem('userId');
+                                if (!userId) {
+                                    console.error('User not logged in. No userId found in sessionStorage.');
+                                    profileNameEl.textContent = 'Guest';
+                                    profileDeptEl.textContent = 'Not logged in';
+                                    return;
+                                }
+
+                                try {
+                                    // Initialize Firestore
+                                    const db = firebase.firestore();
+                                    const votersRef = db.collection('voters');
+
+                                    // Create a query to find the user document where 'username' matches the userId
+                                    const q = votersRef.where('username', '==', userId);
+                                    const querySnapshot = await q.get();
+
+                                    if (querySnapshot.empty) {
+                                        console.error('No matching user document found.');
+                                        profileNameEl.textContent = 'User Not Found';
+                                        profileDeptEl.textContent = 'Error';
+                                        return;
+                                    }
+
+                                    // Get the user data from the first (and only) matching document
+                                    const userData = querySnapshot.docs[0].data();
+
+                                    // Update the HTML with the fetched data
+                                    // Use '||' to provide a fallback if the field is missing
+                                    profileNameEl.textContent = userData.fullname || 'No Name Provided';
+                                    profileDeptEl.textContent = `@${userData.username || 'no-username'}`;
+
+                                } catch (error) {
+                                    console.error('Error fetching user profile:', error);
+                                    profileNameEl.textContent = 'Error';
+                                    profileDeptEl.textContent = 'Could not load';
+                                }
+                            });
+                        </script>
 
                         <!-- Clock -->
                         <div class="bg-white/100 rounded-2xl p-4 text-center" id="clock">
@@ -160,8 +205,50 @@
 
             <!-- Tab 1 -->
             <div id="tab-1" class="tab-content hidden text-white">
-                <h2 class="text-2xl font-bold mb-2">📝 Voting Section</h2>
-                <p>This section will display the voting area.</p>
+                <h2 class="text-2xl font-bold mb-6 text-center">😊 Motivate Section</h2>
+
+                <div class="grid md:grid-cols-2 gap-6 mt-8">
+                    <!-- Button 1 -->
+                    <div class="relative group">
+                        <a href="https://team-ielect.github.io/motivate/home.html" target="_blank"
+                            rel="noopener noreferrer"
+                            class="block overflow-hidden rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+                            <div class="relative h-64">
+                                <img src="./pic/btn1.jpg" alt="First Motivation" class="w-full h-full object-cover">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-xl font-bold text-white mb-2">Right to Vote</h3>
+                                    <p class="text-white/90 text-sm">It is your Right to vote - a Right Vote:
+                                        To Know More Click Here
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Button 2 -->
+                    <div class="relative group">
+                        <a href="https://team-ielect.github.io/motivate/quiz.html" target="_blank"
+                            rel="noopener noreferrer"
+                            class="block overflow-hidden rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+                            <div class="relative h-64">
+                                <img src="./pic/btn2.jpg" alt="Second Motivation" class="w-full h-full object-cover">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                </div>
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <h3 class="text-xl font-bold text-white mb-2">Quiz Time</h3>
+                                    <p class="text-white/90 text-sm">Evaluate your knowledge about election and voting
+                                        system: To Know More Click Here</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <!-- Tab 2 -->
